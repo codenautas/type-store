@@ -45,7 +45,6 @@ json4all.addType(Big,{
         return o.toString();
     },
 });
-console.log('xxxxxxxxxxxxxxx Big registrado',Big.name);
 
 return TypeStore;
 
