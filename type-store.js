@@ -38,7 +38,6 @@ TypeStore.bigint.fromString = function fromString(textWithBigInt){
 
 json4all.addType(Big,{
     construct: function construct(value){
-        console.log("agrega el tipo");
         return new Big(value); 
     }, 
     deconstruct: function deconstruct(o){
