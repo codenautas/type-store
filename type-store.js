@@ -30,17 +30,26 @@ var json4all=require('json4all');
 TypeStore.type={};
 
 TypeStore.type.bigint={};
+
 TypeStore.type.bigint.fromString = function fromString(textWithBigInt){
     var number = Number(textWithBigInt);
     if(number>=1000000000000000 || number<=-1000000000000000){
+        console.log('xxxxxx bigint',number)
         number = new Big(textWithBigInt);
-        number.typeStore={type:'bigint'};
-        number.toLiteral=function(){
-            return number.toString();
-        }
     }
     return number;
 };
+
+Big.prototype.toLiteral=function(){
+    return this.toString();
+};
+Big.prototype.sameValue=function(other){
+    if(typeof other === 'number'){
+        other = new Big(other);
+    }
+    return other instanceof Big && this.toString() == other.toString();
+};
+Big.prototype.typeStore={type:'bigint'};
 
 json4all.addType(Big,{
     construct: function construct(value){
