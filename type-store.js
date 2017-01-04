@@ -27,11 +27,17 @@ var TypeStore = {};
 var Big = require('big.js');
 var json4all=require('json4all');
 
-TypeStore.bigint={};
-TypeStore.bigint.fromString = function fromString(textWithBigInt){
+TypeStore.type={};
+
+TypeStore.type.bigint={};
+TypeStore.type.bigint.fromString = function fromString(textWithBigInt){
     var number = Number(textWithBigInt);
     if(number>=1000000000000000 || number<=-1000000000000000){
-        return new Big(textWithBigInt);
+        number = new Big(textWithBigInt);
+        number.typeStore={type:'bigint'};
+        number.toLiteral=function(){
+            return number.toString();
+        }
     }
     return number;
 };
