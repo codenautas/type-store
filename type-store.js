@@ -24,21 +24,53 @@
 var TypeStore = {};
 /*jshint +W004 */
 
+var changing = require('best-globals').changing;
 var Big = require('big.js');
 var json4all=require('json4all');
 
 TypeStore.type={};
 
-TypeStore.type.bigint={};
-
-TypeStore.type.bigint.fromString = function fromString(textWithBigInt){
-    var number = Number(textWithBigInt);
-    if(number>=1000000000000000 || number<=-1000000000000000){
-        console.log('xxxxxx bigint',number)
-        number = new Big(textWithBigInt);
-    }
-    return number;
+TypeStore.type.number = {
+    typeDbPg:'double precision',
+    typedControlName:'number',
+    pgSpecialParse:false,
+    pg_OID:701,
 };
+
+TypeStore.type.hugeint={
+    maxBig: 1000000000000000,
+    minBig: -1000000000000000,
+    typeDbPg:'number(1000)',
+    typedControlName:'number',
+    pgSpecialParse:true,
+    pg_OID:1700,
+    fromString: function fromString(textWithBigInt){
+        var self = this;
+        var number = Number(textWithBigInt);
+        if('maxValue' in self && number>self.maxValue || 'minValue' in self && number<self.minValue){
+            throw new TypeError("type-store: value out of range")
+        }
+        if(number>=self.maxBig || number<=self.minBig){
+            number = new Big(textWithBigInt);
+        }
+        return number;
+    }
+};
+
+TypeStore.type.integer=changing(TypeStore.type.hugeint,{
+    maxValue: 2147483647,
+    minValue: -2147483648,
+    typeDbPg:'integer',
+    pgSpecialParse:false,
+    pg_OID:23,
+});
+
+TypeStore.type.bigint=changing(TypeStore.type.hugeint,{
+    maxValue: 9223372036854775807,
+    minValue: -9223372036854775808,
+    typeDbPg:'bigint',
+    pg_OID:20,
+});
 
 Big.prototype.toLiteral=function(){
     return this.toString();

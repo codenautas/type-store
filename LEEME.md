@@ -34,6 +34,24 @@ $ npm install type-store
 ```
 
 <!--lang:es-->
+# Objetivo
+
+Tener un módulo que se encargue de:
+
+  * conocer todos los tipos que se pueden usar en un programa
+  * saber cómo
+    * leerlo de un input común del usuario (saber si es válido o no, por qué y como se transforma al tipo correspondiente)
+    * transformarlo en un literal para envíar a la base de datos
+    * leerlo desde la base de datos
+    * detectarlo desde distintos posibles formatos de entrada (para hacer input automático)
+  * conocer
+    * los Regexp y las teclas permitidas para los inputs
+
+<!--lang:en--]
+# Goal
+[!--lang:*-->
+
+<!--lang:es-->
 ## Licencia
 <!--lang:en--]
 ## License
