@@ -72,6 +72,27 @@ TypeStore.type.bigint=changing(TypeStore.type.hugeint,{
     pg_OID:20,
 });
 
+TypeStore.type["ARRAY:text"]={
+    typeDbPg:'text[]',
+    typedControlName:'FROM:type-store',
+    validateTypedData:function validateARRAY__Text(anyValue){
+        if(anyValue!=null){
+            if(!(anyValue instanceof Array)){
+                throw new Error("Non an Array in type-store ARRAY:text");
+            }else{
+                anyValue.forEach(function(anyElement, i){
+                    if(typeof anyElement!=='string'){
+                        throw new Error("Non a string in type-store ARRAY:text["+i+"]");
+                    }
+                });
+            }
+        }
+    },
+    fromString:function fromString(stringWithArrayText){
+        return stringWithArrayText.split(/\s+,\s+/g).map(function(text){ return text.trim(); });
+    }
+};
+
 Big.prototype.toLiteral=function(){
     return this.toString();
 };
