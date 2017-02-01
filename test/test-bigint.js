@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require('assert');
+var assert = require('assert');
 var TypeStore = require("../type-store.js");
 
 var Big = require('big.js');
