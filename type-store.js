@@ -89,7 +89,7 @@ TypeStore.type["ARRAY:text"]={
         }
     },
     fromString:function fromString(stringWithArrayText){
-        return stringWithArrayText.split(/\s+,\s+/g).map(function(text){ return text.trim(); });
+        return stringWithArrayText.split(/\s*;\s*/g).map(function(text){ return text.trim(); });
     }
 };
 
