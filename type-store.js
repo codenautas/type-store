@@ -93,6 +93,18 @@ TypeStore.type["ARRAY:text"]={
     }
 };
 
+TypeStore.type.jsonb = {
+    typeDbPg:'jsonb',
+    typedControlName:'text',
+    pgSpecialParse:true,
+    pg_OID:3802,
+    fromString:function fromString(stringWithJsonb){
+        return stringWithJsonb;
+    }
+};
+
+
+
 Big.prototype.toLiteral=function(){
     return this.toString();
 };
