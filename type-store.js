@@ -27,6 +27,7 @@ var TypeStore = {};
 var changing = require('best-globals').changing;
 var Big = require('big.js');
 var json4all=require('json4all');
+var likeAr = require('like-ar');
 
 TypeStore.type={};
 
@@ -34,6 +35,7 @@ TypeStore.type.number = {
     typeDbPg:'double precision',
     typedControlName:'number',
     pgSpecialParse:false,
+    inexactNumber:true,
     pg_OID:701,
 };
 
@@ -124,6 +126,16 @@ json4all.addType(Big,{
         return o.toString();
     },
 });
+
+TypeStore.completeTypeInfo = function(typeInfo){
+    if(typeInfo.type in TypeStore.type){
+        likeAr(TypeStore.type[typeInfo.type]).forEach(function(value, attr){
+            if(!(attr in typeInfo)){
+                typeInfo[attr]=value;
+            }
+        });
+    }
+}
 
 return TypeStore;
 
