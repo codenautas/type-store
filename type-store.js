@@ -128,8 +128,8 @@ json4all.addType(Big,{
 });
 
 TypeStore.completeTypeInfo = function(typeInfo){
-    if(typeInfo.type in TypeStore.type){
-        likeAr(TypeStore.type[typeInfo.type]).forEach(function(value, attr){
+    if(typeInfo.typeName in TypeStore.type){
+        likeAr(TypeStore.type[typeInfo.typeName]).forEach(function(value, attr){
             if(!(attr in typeInfo)){
                 typeInfo[attr]=value;
             }
