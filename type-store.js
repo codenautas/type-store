@@ -101,7 +101,10 @@ TypeStore.type.jsonb = {
     pgSpecialParse:true,
     pg_OID:3802,
     fromString:function fromString(stringWithJsonb){
-        return stringWithJsonb;
+        return JSON.parse(stringWithJsonb);
+    },
+    validateTypedData: function validateTypedData(object){
+        return object===null || object instanceof Object;
     }
 };
 
