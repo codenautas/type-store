@@ -28,6 +28,7 @@ var changing = require('best-globals').changing;
 var Big = require('big.js');
 var json4all=require('json4all');
 var likeAr = require('like-ar');
+var jsToHtml = require('js-to-html');
 
 TypeStore.type={};
 
@@ -92,12 +93,25 @@ TypeStore.type["ARRAY:text"]={
     },
     fromString:function fromString(stringWithArrayText){
         return stringWithArrayText.split(/\s*;\s*/g).map(function(text){ return text.trim(); });
-    }
+    },
+    toPlainString:function toPlainString(typedValue){
+        return typedValue.join(';');
+    },
+    toHtml:function toHtml(typedValue){
+        var x=[];
+        typedValue.forEach(function(element, i){
+            if(i){
+                x.push(html.span({class:'array-separator'},';'));
+            }
+            x.push(html.span({class:'array-element'},element));
+        });
+        return html.span({class:'array'}, x);
+    },
 };
 
 TypeStore.type.jsonb = {
     typeDbPg:'jsonb',
-    typedControlName:'text',
+    typedControlName:'FROM:type-store',
     pgSpecialParse:true,
     pg_OID:3802,
     fromString:function fromString(stringWithJsonb){
@@ -105,7 +119,14 @@ TypeStore.type.jsonb = {
     },
     validateTypedData: function validateTypedData(object){
         return object===null || object instanceof Object;
-    }
+    },
+    toPlainString:function toPlainString(typedValue){
+        return JSON.stringify(typedValue);
+    },
+    toJsHtml:function toJsHtml(typedValue){
+        var x=JSON.stringify(typedValue);
+        return html.span({class:'json'}, x);
+    },
 };
 
 
