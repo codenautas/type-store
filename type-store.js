@@ -129,6 +129,12 @@ TypeStore.type.jsonb = {
     },
 };
 
+TypeStore.type.interval = {
+    typeDbPg:'interval',
+    typedControlName:'text',
+    pgSpecialParse:true,
+    pg_OID:27009,
+}
 
 
 Big.prototype.toLiteral=function(){
