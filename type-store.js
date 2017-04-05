@@ -26,6 +26,7 @@ var TypeStore = {};
 
 var changing = require('best-globals').changing;
 var Big = require('big.js');
+var PostgresInterval = require('postgres-interval');
 var json4all=require('json4all');
 var likeAr = require('like-ar');
 var jsToHtml = require('js-to-html');
@@ -131,10 +132,58 @@ TypeStore.type.jsonb = {
 
 TypeStore.type.interval = {
     typeDbPg:'interval',
-    typedControlName:'text',
-    pgSpecialParse:true,
+    typedControlName:'FROM:type-store',
+    pgSpecialParse:false,
     pg_OID:27009,
+    partDefs:[
+        {name:'years'},
+        {name:'months'},
+        {name:'days'},
+        {name:'hours'},
+        {name:'minutes'},
+        {name:'seconds'},
+    ],
+    // constructorFunction:new PostgresInterval().constructor,
+    regExp:/^(?:(\d+)\s*(?:years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:months?|mese?s?))?\s*(?:(\d+)\s*(?:days?|días?|dias?))?\s*(?:(\d+):(\d+):(\d+))?$/,
+    fromString:function fromString(stringWithInterval){
+        var matches=stringWithInterval.match(regExp);
+        if(!matches) return null;
+        var interval=new PostgresInterval();
+        TypeStore.type.interval.partDefs.forEach(function(partDef, i){
+            if(matches[i+1]){
+                interval[partDef.name]=Number(matches[i+1]);
+            }
+        });
+        return interval;
+    },
+    validateTypedData: function validateTypedData(object){
+        return object===null || object instanceof PostgresInterval;
+        // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
+    },
+    toPlainString:function toPlainString(typedValue){
+        return typedValue.toISO();
+    },
+    toJsHtml:function toJsHtml(typedValue){
+        var x=typedValue.toISO();
+        return html.span({class:'interval'}, x);
+    },
 }
+
+/*
+Interval.prototype.toLiteral=function(){
+    return this.toString();
+};
+*/
+PostgresInterval.prototype.typeStore={type:'interval'};
+
+json4all.addType(PostgresInterval,{
+    construct: function construct(value){
+        return new PostgresInterval(value); 
+    }, 
+    deconstruct: function deconstruct(o){
+        return o.toString();
+    },
+});
 
 
 Big.prototype.toLiteral=function(){
