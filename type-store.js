@@ -136,12 +136,12 @@ TypeStore.type.interval = {
     pgSpecialParse:false,
     pg_OID:27009,
     partDefs:[
-        {name:'years'},
-        {name:'months'},
-        {name:'days'},
-        {name:'hours'},
-        {name:'minutes'},
-        {name:'seconds'},
+        {name:'years'  , optative:true , sufix:'Y '},
+        {name:'months' , optative:true , sufix:'M '},
+        {name:'days'   , optative:true , sufix:'D '},
+        {name:'hours'  , optative:false, sufix:':' },
+        {name:'minutes', optative:false, sufix:':' },
+        {name:'seconds', optative:false, sufix:''  },
     ],
     // constructorFunction:new PostgresInterval().constructor,
     regExp:/^(?:(\d+)\s*(?:years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:months?|mese?s?))?\s*(?:(\d+)\s*(?:days?|días?|dias?))?\s*(?:(\d+):(\d+):(\d+))?$/,
@@ -161,10 +161,15 @@ TypeStore.type.interval = {
         // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
     },
     toPlainString:function toPlainString(typedValue){
-        return typedValue.toISO();
+        var t = TypeStore.type.interval.partDefs.map(function(partDef, i){
+            if(!partDef.optative || typedValue[partDef.name]){
+                return typedValue[partDef.name]+partDef.sufix;
+            }
+        }).join('');
+        return t;
     },
     toJsHtml:function toJsHtml(typedValue){
-        var x=typedValue.toISO();
+        var x=TypeStore.type.interval.toPlainString(typedValue);
         return html.span({class:'interval'}, x);
     },
 }
