@@ -140,16 +140,17 @@ TypeStore.type.interval = {
         {name:'months' , optative:true , sufix:'M '},
         {name:'days'   , optative:true , sufix:'D '},
         {name:'hours'  , optative:false, sufix:':' },
-        {name:'minutes', optative:false, sufix:':' },
-        {name:'seconds', optative:false, sufix:''  },
+        {name:'minutes', optative:false, sufix:':' , twoDigits:true },
+        {name:'seconds', optative:false, sufix:''  , twoDigits:true },
     ],
     // constructorFunction:new PostgresInterval().constructor,
-    regExp:/^(?:(\d+)\s*(?:years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:months?|mese?s?))?\s*(?:(\d+)\s*(?:days?|días?|dias?))?\s*(?:(\d+):(\d+):(\d+))?$/,
+    regExp:/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i,
     fromString:function fromString(stringWithInterval){
-        var matches=stringWithInterval.match(regExp);
+        var module = TypeStore.type.interval;
+        var matches=stringWithInterval.match(module.regExp);
         if(!matches) return null;
         var interval=new PostgresInterval();
-        TypeStore.type.interval.partDefs.forEach(function(partDef, i){
+        module.partDefs.forEach(function(partDef, i){
             if(matches[i+1]){
                 interval[partDef.name]=Number(matches[i+1]);
             }
@@ -161,15 +162,18 @@ TypeStore.type.interval = {
         // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
     },
     toPlainString:function toPlainString(typedValue){
-        var t = TypeStore.type.interval.partDefs.map(function(partDef, i){
-            if(!partDef.optative || typedValue[partDef.name]){
-                return typedValue[partDef.name]+partDef.sufix;
+        var module = TypeStore.type.interval;
+        var t = module.partDefs.map(function(partDef, i){
+            var value=typedValue[partDef.name]||0;
+            if(!partDef.optative && (typedValue.hours>0||typedValue.minutes>0||typedValue.seconds>0) || value){
+                return (partDef.twoDigits && value<10?'0':'')+value+partDef.sufix;
             }
-        }).join('');
+        }).join('').trim();
         return t;
     },
     toJsHtml:function toJsHtml(typedValue){
-        var x=TypeStore.type.interval.toPlainString(typedValue);
+        var module = TypeStore.type.interval;
+        var x=module.toPlainString(typedValue);
         return html.span({class:'interval'}, x);
     },
 }
