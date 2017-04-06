@@ -183,15 +183,11 @@ Interval.prototype.toLiteral=function(){
     return this.toString();
 };
 */
-PostgresInterval.prototype.typeStore={type:'interval'};
+// PostgresInterval.prototype.typeStore={type:'interval'};
 
 json4all.addType(PostgresInterval,{
-    construct: function construct(value){
-        return new PostgresInterval(value); 
-    }, 
-    deconstruct: function deconstruct(o){
-        return o.toString();
-    },
+    construct: json4all.nonymizate,
+    deconstruct: json4all.anonymizate
 });
 
 
