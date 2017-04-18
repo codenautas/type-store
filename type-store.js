@@ -182,6 +182,10 @@ TypeStore.type.interval = {
     },
     toExcelType: function toExcelType(typedValue){
         return 's';
+    },
+    fromExcelCell: function fromExcelCell(cell){
+        var module = TypeStore.type.interval;
+        return module.fromString(cell.w);
     }
 }
 
