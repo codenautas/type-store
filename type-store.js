@@ -176,6 +176,13 @@ TypeStore.type.interval = {
         var x=module.toPlainString(typedValue);
         return html.span({class:'interval'}, x);
     },
+    toExcelValue: function toExcelValue(typedValue){
+        var module = TypeStore.type.interval;
+        return module.toPlainString(typedValue);
+    },
+    toExcelType: function toExcelType(typedValue){
+        return 's';
+    }
 }
 
 /*
