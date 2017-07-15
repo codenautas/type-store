@@ -24,6 +24,8 @@ function PostgresInterval(){};
 
 PostgresInterval["4client"]=true;
 
+PostgresInterval.prototype.
+
 return PostgresInterval;
 
 });

@@ -24,9 +24,9 @@
 var TypeStore = {};
 /*jshint +W004 */
 
-var changing = require('best-globals').changing;
+var bestGlobals = require('best-globals');
+var changing = bestGlobals.changing;
 var Big = require('big.js');
-var PostgresInterval = require('postgres-interval');
 var json4all=require('json4all');
 var likeAr = require('like-ar');
 var jsToHtml = require('js-to-html');
@@ -133,8 +133,8 @@ TypeStore.type.jsonb = {
 TypeStore.type.interval = {
     typeDbPg:'interval',
     typedControlName:'FROM:type-store',
-    pgSpecialParse:false,
-    pg_OID:27009,
+    pgSpecialParse:true,
+    pg_OID:1186,
     partDefs:[
         {name:'years'  , optative:true , sufix:'Y '},
         {name:'months' , optative:true , sufix:'M '},
@@ -149,19 +149,21 @@ TypeStore.type.interval = {
         var module = TypeStore.type.interval;
         var matches=stringWithInterval.match(module.regExp);
         if(!matches) return null;
-        var interval=new PostgresInterval();
+        var interval={};
         module.partDefs.forEach(function(partDef, i){
             if(matches[i+1]){
                 interval[partDef.name]=Number(matches[i+1]);
             }
         });
-        return interval;
+        return bestGlobals.timeInterval(interval);
     },
     validateTypedData: function validateTypedData(object){
-        return object===null || object instanceof PostgresInterval;
+        return object===null || object instanceof bestGlobals.TimeInterval;
         // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
     },
     toPlainString:function toPlainString(typedValue){
+        return typedValue.toPlainString();
+        /*
         var module = TypeStore.type.interval;
         var t = module.partDefs.map(function(partDef, i){
             var value=typedValue[partDef.name]||0;
@@ -170,6 +172,7 @@ TypeStore.type.interval = {
             }
         }).join('').trim();
         return t;
+        */
     },
     toJsHtml:function toJsHtml(typedValue){
         var module = TypeStore.type.interval;
@@ -196,9 +199,13 @@ Interval.prototype.toLiteral=function(){
 */
 // PostgresInterval.prototype.typeStore={type:'interval'};
 
-json4all.addType(PostgresInterval,{
-    construct: json4all.nonymizate,
-    deconstruct: json4all.anonymizate
+json4all.addType(bestGlobals.TimeInterval,{
+    construct: function construct(value){ 
+        return new bestGlobals.TimeInterval(value); 
+    }, 
+    deconstruct: function deconstruct(o){
+        return o.timeInterval;
+    },
 });
 
 
