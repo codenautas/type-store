@@ -145,8 +145,14 @@ TypeStore.type.interval = {
     ],
     // constructorFunction:new PostgresInterval().constructor,
     regExp:/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i,
-    fromString:function fromString(stringWithInterval){
+    fromString:function fromString(stringWithInterval, typeInfo){
         var module = TypeStore.type.interval;
+        if(!isNaN(stringWithInterval)){
+            if(!typeInfo || !typeInfo.timeUnit){
+                throw new TypeError('NOT timeInterval');
+            }
+            stringWithInterval=stringWithInterval+typeInfo.timeUnit;
+        }
         var matches=stringWithInterval.match(module.regExp);
         if(!matches) return null;
         var interval={};
