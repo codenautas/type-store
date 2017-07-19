@@ -44,10 +44,10 @@ TypeStore.type.number = {
 TypeStore.type.hugeint={
     maxBig: 1000000000000000,
     minBig: -1000000000000000,
-    typeDbPg:'number(1000)',
+    typeDbPg:'numeric(1000)',
     typedControlName:'number',
     pgSpecialParse:true,
-    pg_OID:1700,
+    // pg_OID:1700,
     fromString: function fromString(textWithBigInt){
         var self = this;
         var number = Number(textWithBigInt);
@@ -75,6 +75,23 @@ TypeStore.type.bigint=changing(TypeStore.type.hugeint,{
     typeDbPg:'bigint',
     pg_OID:20,
 });
+
+TypeStore.type.decimal={
+    maxBig: 1000000000000000,
+    minBig: -1000000000000000,
+    typeDbPg:'numeric',
+    typedControlName:'number',
+    pgSpecialParse:true,
+    pg_OID:1700,
+    fromString: function fromString(textWithBigInt){
+        var self = this;
+        var number = Number(textWithBigInt);
+        if(number>=self.maxBig || number<=self.minBig || Math.floor(number)!=Math.ceil(number)){
+            number = new Big(textWithBigInt);
+        }
+        return number;
+    }
+};
 
 TypeStore.type["ARRAY:text"]={
     typeDbPg:'text[]',
