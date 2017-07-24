@@ -215,6 +215,41 @@ TypeStore.type.interval = {
     }
 }
 
+TypeStore.type.timestamp = {
+    typeDbPg:'timestamp',
+    typedControlName:'FROM:type-store',
+    // pgSpecialParse:true,
+    pg_OID:1114,
+    // constructorFunction:new PostgresInterval().constructor,
+    fromString:function fromString(text, typeInfo){
+        return bestGlobals.datetime.iso(text);
+    },
+    validateTypedData: function validateTypedData(object){
+        console.log('xxxxxxxxxxxxx ',object, typeof object, (object.constructor||{}).name, object.isRealDateTime);
+        return object===null || object instanceof Date && object.isRealDateTime;
+    },
+    toPlainString:function toPlainString(typedValue){
+        console.log('xxxxxxxxxxxxx ',typedValue, typeof typedValue, (typedValue.constructor||{}).name);
+        return typedValue.toISOString();
+    },
+    toJsHtml:function toJsHtml(typedValue){
+        var module = TypeStore.type.timestamp;
+        var x=module.toPlainString(typedValue);
+        return html.span({class:'timestamp'}, x);
+    },
+    toExcelValue: function toExcelValue(typedValue){
+        var module = TypeStore.type.timestamp;
+        return module.toPlainString(typedValue);
+    },
+    toExcelType: function toExcelType(typedValue){
+        return 's';
+    },
+    fromExcelCell: function fromExcelCell(cell){
+        var module = TypeStore.type.timestamp;
+        return module.fromString(cell.w);
+    }
+}
+
 /*
 Interval.prototype.toLiteral=function(){
     return this.toString();
