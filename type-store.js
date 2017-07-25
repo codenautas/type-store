@@ -222,16 +222,12 @@ TypeStore.type.timestamp = {
     pg_OID:1114,
     // constructorFunction:new PostgresInterval().constructor,
     fromString:function fromString(text, typeInfo){
-        console.log('xxxxxxxxxxxxxxx fromString',text)
-        console.log('xxxxxxxxxxxxxxx fromString x',bestGlobals.datetime.iso(text))
         return bestGlobals.datetime.iso(text);
     },
     validateTypedData: function validateTypedData(object){
-        console.log('xxxxxxxxxxxxx ',object, typeof object, (object.constructor||{}).name, object.isRealDateTime);
         return object===null || object instanceof Date && object.isRealDateTime;
     },
     toPlainString:function toPlainString(typedValue){
-        console.log('xxxxxxxxxxxxx ',typedValue, typeof typedValue, (typedValue.constructor||{}).name);
         return typedValue.toYmdHmsM();
     },
     toJsHtml:function toJsHtml(typedValue){
