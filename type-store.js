@@ -218,10 +218,12 @@ TypeStore.type.interval = {
 TypeStore.type.timestamp = {
     typeDbPg:'timestamp',
     typedControlName:'FROM:type-store',
-    // pgSpecialParse:true,
+    pgSpecialParse:true,
     pg_OID:1114,
     // constructorFunction:new PostgresInterval().constructor,
     fromString:function fromString(text, typeInfo){
+        console.log('xxxxxxxxxxxxxxx fromString',text)
+        console.log('xxxxxxxxxxxxxxx fromString x',bestGlobals.datetime.iso(text))
         return bestGlobals.datetime.iso(text);
     },
     validateTypedData: function validateTypedData(object){
@@ -230,7 +232,7 @@ TypeStore.type.timestamp = {
     },
     toPlainString:function toPlainString(typedValue){
         console.log('xxxxxxxxxxxxx ',typedValue, typeof typedValue, (typedValue.constructor||{}).name);
-        return typedValue.toISOString();
+        return typedValue.toYmdHmsM();
     },
     toJsHtml:function toJsHtml(typedValue){
         var module = TypeStore.type.timestamp;
@@ -266,6 +268,16 @@ json4all.addType(bestGlobals.TimeInterval,{
     },
 });
 
+json4all.addType(bestGlobals.Datetime,{
+    construct: function construct(value){ 
+        return new bestGlobals.Datetime(value); 
+    }, 
+    deconstruct: function deconstruct(o){
+        return o.parts;
+    },
+});
+
+// bestGlobals.registerJson4All(json4all);
 
 Big.prototype.toLiteral=function(){
     return this.toString();
