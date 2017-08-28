@@ -6,6 +6,7 @@ var assert = require('assert');
 var TypeStore = require("../type-store.js");
 
 describe("interval", function(){
+    var typeInterval = new TypeStore.type.interval();
     [
         {input:'13:40:00', output:'13:40:00', interval:{hours:13, minutes:40, seconds:0}},
         {input:"3:30"    , output:'3:30:00' , interval:{hours:3, minutes:30}},
@@ -17,9 +18,9 @@ describe("interval", function(){
     ].forEach(function(fixture){
         it("accept input \""+fixture.input+"\"", function(){
             try{
-                var obtainedInterval = TypeStore.type.interval.fromString(fixture.input, fixture.typeInfo);
+                var obtainedInterval = typeInterval.fromString(fixture.input, fixture.typeInfo);
                 discrepances.showAndThrow(obtainedInterval, bestGlobals.timeInterval(fixture.interval));
-                var obtainedOutput=TypeStore.type.interval.toPlainString(obtainedInterval);
+                var obtainedOutput=typeInterval.toPlainString(obtainedInterval);
             }catch(err){
                 obtainedOutput=err;
             }
