@@ -42,6 +42,14 @@ Big.prototype.sameValue=function(other){
     }
     return other instanceof Big && this.toString() == other.toString();
 };
+
+TypeStore.options={
+    number:{
+        decimalSeparator:'.',
+        milesSeparator:''
+    }
+}
+
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
     this.typeInfo = typeInfo;
