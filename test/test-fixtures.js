@@ -18,8 +18,20 @@ function ignoreTypeInfoAndThrow(obtained, expected){
     discrepances.showAndThrow(obtained, expected);
 }
 
+TypeStore.messages = TypeStore.messages.es;
+
 describe("fixtures", function(){
   [
+      {typeName:'boolean', fixtures:[
+          {fromString:'s', value:true, toPlainString:'true', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
+          {fromString:'f', value:false, toPlainString:'false', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
+          {fromString:null, value:null, toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
+      ]},
+      {typeName:'text', fixtures:[
+          {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
+          {fromString:'', value:'', toPlainString:'', toHtmlText:"<span class=text><span class='text-empty'></span></span>"},
+          {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
+      ]},
       {typeName:'hugeint', fixtures:[
       ]},
       {typeName:'integer', fixtures:[
@@ -54,6 +66,10 @@ describe("fixtures", function(){
       {typeName:'interval', describeFixtures:'with unit', timeUnit:'hours', fixtures:[
           {fromString:'5'       , toPlainString:'5:00:00'},
       ]},
+      {typeName:'date', fixtures:[
+          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
+          {fromString:'4'       , fromStringError:new Error('invalid date')},
+      ], constructorFunction:bestGlobals.datetime},
       {typeName:'timestamp', fixtures:[
           {fromString:'2017-12-23 13:40:00', toPlainString:'2017-12-23 13:40:00.000', value:bestGlobals.datetime.iso('2017-12-23 13:40:00')},
           {fromString:'4'       , fromStringError:new Error('invalid datetime')},

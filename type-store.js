@@ -36,6 +36,22 @@ TypeStore.type={};
 
 TypeStore.class={};
 
+TypeStore.messages={
+    boolean:{
+        true:'yes',
+        false:'no',
+        null:''
+    },
+};
+
+TypeStore.messages.es={
+    boolean:{
+        true:'sí',
+        false:'no',
+        null:''
+    },
+};
+
 Big.prototype.sameValue=function(other){
     if(typeof other === 'number'){
         other = new TypeStore.class.Big(other);
@@ -84,6 +100,50 @@ TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
 };
 TypeBase.prototype.typedControlName='FROM:type-store';
 
+TypeStore.type.boolean = function TypeText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.boolean.prototype.typeDbPg='text';
+TypeStore.type.boolean.prototype.typedControlName='text';
+TypeStore.type.boolean.prototype.pgSpecialParse=false;
+TypeStore.type.boolean.prototype.toPlainString=function toPlainString(typedValue){
+    return typedValue+'';
+};
+TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
+    var falseInitials={'n':true,'N':true,'0':true,'2':true,'F':true,'f':true,'\u043d':true,'\u041d':true,'\u0147':true,'\u0148':true};
+    return textWithValue==null?null:!falseInitials[textWithValue];
+};
+TypeStore.type.boolean.prototype.toHtml=function toHtmlBoolean(typedValue){
+    return html.span({"class": "boolean"},[html.span({"class": "boolean-"+typedValue},TypeStore.messages.boolean[typedValue])]);
+};
+TypeStore.type.boolean.prototype.validateTypedData=function validateTypedData(typedData){
+    return typedData==null || typeof typedData === 'boolean';
+};
+
+TypeStore.type.text = function TypeText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.text.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.text.prototype.typeDbPg='text';
+TypeStore.type.text.prototype.typedControlName='text';
+TypeStore.type.text.prototype.pgSpecialParse=false;
+TypeStore.type.text.prototype.toPlainString=function toPlainString(typedValue){
+    return typedValue;
+};
+TypeStore.type.text.prototype.fromString=function fromString(textWithValue){
+    return textWithValue;
+};
+TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
+    var answer=typedValue;
+    if(typedValue===''){
+        answer=html.span({"class": "text-empty"})
+    }
+    if(typedValue==null){
+        answer=html.span({"class": "text-null"})
+    }
+    return html.span({"class": "text"}, answer);
+};
+TypeStore.type.text.prototype.validateTypedData=function validateTypedData(typedData){
+    return typedData==null || typeof typedData === 'string';
+};
+
 TypeStore.type.number = function TypeNumber(){ TypeBase.apply(this, arguments); }
 TypeStore.type.number.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.number.prototype.typeDbPg='double precision';
@@ -102,9 +162,7 @@ TypeStore.type.number.prototype.toHtml=function toHtmlNumber(typedValue){
             if(sign=='-'){
                 rta.push(html.span({class: "number-sign"}, sign));
             }
-            if(prefix){
-                rta.push(html.span({"class": "number-miles"}, prefix));
-            }
+            rta.push(html.span({"class": "number-miles"}, prefix));
             triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
                 rta.push(html.span({"class": "number-separator"},TypeStore.options.number.milesSeparator));
                 rta.push(html.span({"class": "number-miles"}, triplet));
@@ -259,6 +317,28 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     }
 };
 
+TypeStore.type.date = function TypeArrayText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.date.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.date.prototype.typeDbPg='date';
+TypeStore.type.date.prototype.fromString=function fromString(text){
+    return bestGlobals.date.iso(text);
+};
+TypeStore.type.date.prototype.validateTypedData=function validateTypedData(object){
+    return object===null || object instanceof Date;
+};
+TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
+    return typedValue.toYmd();
+};
+TypeStore.type.date.prototype.toHtml=function toHtmlDate(typedValue){
+    var parts=[];
+    parts.push(html.span({"class":"date-day"},typedValue.getDate()));
+    parts.push(html.span({"class":"date-sep"},'/'));
+    parts.push(html.span({"class":"date-month"},typedValue.getMonth()+1));
+    parts.push(html.span({"class":"date-sep"},'/'));
+    parts.push(html.span({"class":"date-year"},typedValue.getFullYear()));
+    return html.span({"class":"date"}, parts);
+};
+
 TypeStore.type.interval = function TypeArrayText(){ TypeBase.apply(this, arguments); }
 TypeStore.type.interval.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.interval.prototype.typeDbPg='interval';
@@ -319,13 +399,13 @@ TypeStore.type.timestamp.prototype.pg_OID=1114;
 // constructorFunction:new PostgresInterval().constructor,
 TypeStore.type.timestamp.prototype.fromString=function fromString(text, typeInfo){
     return bestGlobals.datetime.iso(text);
-},
+};
 TypeStore.type.timestamp.prototype.validateTypedData=function validateTypedData(object){
     return object===null || object instanceof bestGlobals.Datetime;
-},
+};
 TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmdHmsM();
-},
+};
 
 /*
 Interval.prototype.toLiteral=function(){
@@ -343,6 +423,7 @@ json4all.addType(bestGlobals.TimeInterval,{
     },
 });
 
+/*
 json4all.addType(bestGlobals.Datetime,{
     construct: function construct(value){ 
         return new bestGlobals.Datetime(value); 
@@ -351,6 +432,7 @@ json4all.addType(bestGlobals.Datetime,{
         return o.parts;
     },
 });
+*/
 
 json4all.addType(Big,{
     construct: function construct(value){ 
@@ -361,10 +443,11 @@ json4all.addType(Big,{
     },
 });
 
-// bestGlobals.registerJson4All(json4all);
+bestGlobals.registerJson4All(json4all);
 
 likeAr(TypeStore.type).forEach(function(typeDef, typeName){
     typeDef.prototype.typeName = typeName;
+    /*
     json4all.addType(typeName,{
         construct: function construct(value){ 
             return new bestGlobals.TimeInterval(value); 
@@ -373,6 +456,7 @@ likeAr(TypeStore.type).forEach(function(typeDef, typeName){
             return o.timeInterval;
         },
     });
+    */
 });
 
 TypeStore.completeTypeInfo = function(typeInfo){
