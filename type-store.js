@@ -82,6 +82,7 @@ TypeBase.prototype.toExcelType=function toExcelType(typedValue){
 TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
     return this.fromString(cell.w);
 };
+TypeBase.prototype.typedControlName='FROM:type-store';
 
 TypeStore.type.number = function TypeNumber(){ TypeBase.apply(this, arguments); }
 TypeStore.type.number.prototype = Object.create(TypeBase.prototype);
@@ -126,7 +127,6 @@ TypeStore.type.hugeint.prototype=Object.create(TypeStore.type.number.prototype);
 TypeStore.type.hugeint.prototype.maxBig= 1000000000000000;
 TypeStore.type.hugeint.prototype.minBig=-1000000000000000;
 TypeStore.type.hugeint.prototype.typeDbPg='numeric(1000)';
-TypeStore.type.hugeint.prototype.typedControlName='number';
 TypeStore.type.hugeint.prototype.pgSpecialParse=true;
 // TypeStore.type.hugeint.prototype.pg_OID:1700,
 TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt){
@@ -184,7 +184,6 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
 TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); }
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
 TypeStore.type["ARRAY:text"].prototype.typeDbPg='text[]';
-TypeStore.type["ARRAY:text"].prototype.typedControlName='FROM:type-store';
 TypeStore.type["ARRAY:text"].prototype.validateTypedData=function validateARRAY__Text(anyValue){
     if(anyValue!=null){
         if(!(anyValue instanceof Array)){
@@ -218,7 +217,6 @@ TypeStore.type["ARRAY:text"].prototype.toHtml=function toHtmlArray(typedValue){
 TypeStore.type.jsonb = function TypeArrayText(){ TypeBase.apply(this, arguments); }
 TypeStore.type.jsonb.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.jsonb.prototype.typeDbPg='jsonb';
-TypeStore.type.jsonb.prototype.typedControlName='FROM:type-store';
 TypeStore.type.jsonb.prototype.pgSpecialParse=true;
 TypeStore.type.jsonb.prototype.pg_OID=3802;
 TypeStore.type.jsonb.prototype.fromString=function fromString(stringWithJsonb){
@@ -263,7 +261,6 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
 TypeStore.type.interval = function TypeArrayText(){ TypeBase.apply(this, arguments); }
 TypeStore.type.interval.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.interval.prototype.typeDbPg='interval';
-TypeStore.type.interval.prototype.typedControlName='FROM:type-store';
 TypeStore.type.interval.prototype.pgSpecialParse=true;
 TypeStore.type.interval.prototype.pg_OID=1186;
 TypeStore.type.interval.prototype.partDefs=[
@@ -316,7 +313,6 @@ TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValu
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); }
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.timestamp.prototype.typeDbPg='timestamp';
-TypeStore.type.timestamp.prototype.typedControlName='FROM:type-store';
 TypeStore.type.timestamp.prototype.pgSpecialParse=true;
 TypeStore.type.timestamp.prototype.pg_OID=1114;
 // constructorFunction:new PostgresInterval().constructor,
