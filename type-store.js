@@ -49,7 +49,7 @@ TypeStore.options={
         milesSeparator:''
     }
 }
-
+        
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
     this.typeInfo = typeInfo;
@@ -97,23 +97,24 @@ TypeStore.type.number.prototype.toPlainString=function toPlainString(typedValue)
 TypeStore.type.number.prototype.toHtml=function toHtmlNumber(typedValue){
     var str = this.toPlainString(typedValue);
     var rta = [];
-    str.replace(/^([-+]?[0-9 ]*)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
-        left.replace(/^([-+]?)([0-9]?[0-9]?)(([0-9][0-9][0-9])*)$/, function(str, sign, prefix, triplets){
+    str.replace(/^([-+]?[0-9 ]+)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
+        left.replace(/^([-+]?)([0-9][0-9]?[0-9]?)(([0-9][0-9][0-9])*)$/, function(str, sign, prefix, triplets){
             if(sign=='-'){
-                rta.push(html.span({class: "number_sign"}, sign));
+                rta.push(html.span({class: "number-sign"}, sign));
             }
             if(prefix){
-                rta.push(html.span({"class": "number_miles"}, prefix));
+                rta.push(html.span({"class": "number-miles"}, prefix));
             }
-            triplets.replace(/[0-9][0-9][0-9]/g,function(triplet){
-                rta.push(html.span({"class": "number_miles"}, triplet));
+            triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
+                rta.push(html.span({"class": "number-separator"},TypeStore.options.number.milesSeparator));
+                rta.push(html.span({"class": "number-miles"}, triplet));
             });
         });
         if(dot){
-            rta.push(html.span({"class": "number_dot"},dot));
+            rta.push(html.span({"class": "number-dot"},TypeStore.options.number.decimalSeparator));
         }
         if(decimals){
-            rta.push(html.span({"class": "number_decimals"},decimals));
+            rta.push(html.span({"class": "number-decimals"},decimals));
         }
     });
     return html.span({"class": "number"}, rta);
