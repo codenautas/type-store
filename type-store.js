@@ -68,7 +68,7 @@ TypeStore.options={
         
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
-    this.typeInfo = typeInfo;
+    //this.typeInfo = typeInfo;
 };
 TypeStore.class.Big.prototype = Object.create(Big.prototype);
 TypeStore.class.Big.prototype.toLiteral=function(){
@@ -78,7 +78,7 @@ TypeStore.class.Big.prototype.toLiteral=function(){
 function TypeBase(){};
 TypeBase.prototype.setTypeInfo = function setTypeInfo(value){
     if(value instanceof Object){
-        value.typeInfo=this;
+        //value.typeInfo=this;
     }
 }
 TypeBase.prototype.toHtmlText = function toHtmlText(value){
@@ -397,13 +397,16 @@ TypeStore.type.timestamp.prototype.typeDbPg='timestamp';
 TypeStore.type.timestamp.prototype.pgSpecialParse=true;
 TypeStore.type.timestamp.prototype.pg_OID=1114;
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.timestamp.prototype.fromString=function fromString(text, typeInfo){
+TypeStore.type.timestamp.prototype.fromString=function fromString(text){
     return bestGlobals.datetime.iso(text);
 };
 TypeStore.type.timestamp.prototype.validateTypedData=function validateTypedData(object){
     return object===null || object instanceof bestGlobals.Datetime;
 };
 TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedValue){
+    if(typedValue.toYmdHmsM==null){
+        console.log('xxxxxxx typedValue', typedValue, typedValue.constructor.name);
+    }
     return typedValue.toYmdHmsM();
 };
 
