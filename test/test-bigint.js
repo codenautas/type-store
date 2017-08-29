@@ -27,7 +27,7 @@ describe("bigint", function(){
         assert(n.div(10).sameValue(123456789012345));
         assert(n.sameValue(typeBigint.fromString(txt)));
     });
-    it.skip("html in spanish", function(){
+    it("html in spanish", function(){
         var txt="12345.67";
         var typeDecimal = new TypeStore.type.decimal();
         var saveOptions = changing({},TypeStore.options);

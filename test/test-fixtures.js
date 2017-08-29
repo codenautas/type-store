@@ -23,14 +23,14 @@ describe("fixtures", function(){
       {typeName:'hugeint', fixtures:[
       ]},
       {typeName:'integer', fixtures:[
-          {fromString:'-646', value:-646, toHtmlText:'<span class=number><span class=number_sign>-</span><span class=number_miles>646</span></span>'},
+          {fromString:'-646', value:-646, toHtmlText:"<span class=number><span class='number-sign'>-</span><span class='number-miles'>646</span></span>"},
           {fromString:'2147483648',
            fromStringError:new TypeError ('type-store: value out of range')
           }
       ]},
       {typeName:'decimal', fixtures:[
-          {fromString:'2147483646', value:2147483646, toHtmlText:'<span class=number><span class=number_miles>2</span><span class=number_miles>147</span><span class=number_miles>483</span><span class=number_miles>646</span></span>'},
-          {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:'<span class=number><span class=number_miles>2</span><span class=number_dot>.</span><span class=number_decimals>3</span></span>'},
+          {fromString:'2147483646', value:2147483646, toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'></span><span class='number-miles'>147</span><span class='number-separator'></span><span class='number-miles'>483</span><span class='number-separator'></span><span class='number-miles'>646</span></span>"},
+          {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>.</span><span class='number-decimals'>3</span></span>"},
           {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001')}
       ]},
       {typeName:'ARRAY:text', fixtures:[
