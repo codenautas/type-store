@@ -405,7 +405,7 @@ TypeStore.type.timestamp.prototype.validateTypedData=function validateTypedData(
 };
 TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedValue){
     if(typedValue.toYmdHmsM==null){
-        console.log('xxxxxxx typedValue', typedValue, typedValue.constructor.name);
+        console.log('xxxxxxx typedValue', typedValue, typedValue.constructor.name, typedValue.toYmdHmsM);
     }
     return typedValue.toYmdHmsM();
 };
