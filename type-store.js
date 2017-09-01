@@ -99,8 +99,17 @@ TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
     return this.fromString(cell.w);
 };
 TypeBase.prototype.typedControlName='FROM:type-store';
+TypeBase.prototype.isValidTypedData=function isValidTypedData(typedData){
+    return false;
+};
+TypeBase.prototype.validateTypedData=function validateTypedData(typedData){
+    if(!this.isValidTypedData(typedData)){
+        throw new Error('not a '+this.typeName+' in input');
+    }
+    return true;
+};
 
-TypeStore.type.boolean = function TypeText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); }
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.boolean.prototype.typeDbPg='text';
 TypeStore.type.boolean.prototype.typedControlName='text';
@@ -115,7 +124,7 @@ TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
 TypeStore.type.boolean.prototype.toHtml=function toHtmlBoolean(typedValue){
     return html.span({"class": "boolean"},[html.span({"class": "boolean-"+typedValue},TypeStore.messages.boolean[typedValue])]);
 };
-TypeStore.type.boolean.prototype.validateTypedData=function validateTypedData(typedData){
+TypeStore.type.boolean.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'boolean';
 };
 
@@ -140,7 +149,7 @@ TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     }
     return html.span({"class": "text"}, answer);
 };
-TypeStore.type.text.prototype.validateTypedData=function validateTypedData(typedData){
+TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'string';
 };
 
@@ -177,7 +186,7 @@ TypeStore.type.number.prototype.toHtml=function toHtmlNumber(typedValue){
     });
     return html.span({"class": "number"}, rta);
 };
-TypeStore.type.number.prototype.validateTypedData=function validateTypedData(typedData){
+TypeStore.type.number.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
 };
 
@@ -273,7 +282,7 @@ TypeStore.type["ARRAY:text"].prototype.toHtml=function toHtmlArray(typedValue){
     return html.span({class:'array'}, x);
 };
 
-TypeStore.type.jsonb = function TypeArrayText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.jsonb = function TypeArrayJsonb(){ TypeBase.apply(this, arguments); }
 TypeStore.type.jsonb.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.jsonb.prototype.typeDbPg='jsonb';
 TypeStore.type.jsonb.prototype.pgSpecialParse=true;
@@ -281,7 +290,7 @@ TypeStore.type.jsonb.prototype.pg_OID=3802;
 TypeStore.type.jsonb.prototype.fromString=function fromString(stringWithJsonb){
     return JSON.parse(stringWithJsonb);
 };
-TypeStore.type.jsonb.prototype.validateTypedData=function validateTypedData(object){
+TypeStore.type.jsonb.prototype.isValidTypedData=function isValidTypedData(object){
     return object===null || object instanceof Object;
 };
 TypeStore.type.jsonb.prototype.toPlainString=function toPlainString(typedValue){
@@ -317,13 +326,13 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     }
 };
 
-TypeStore.type.date = function TypeArrayText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.date = function TypeArrayDate(){ TypeBase.apply(this, arguments); }
 TypeStore.type.date.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.date.prototype.typeDbPg='date';
 TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
-TypeStore.type.date.prototype.validateTypedData=function validateTypedData(object){
+TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(object){
     return object===null || object instanceof Date;
 };
 TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
@@ -339,7 +348,7 @@ TypeStore.type.date.prototype.toHtml=function toHtmlDate(typedValue){
     return html.span({"class":"date"}, parts);
 };
 
-TypeStore.type.interval = function TypeArrayText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.interval = function TypeArrayInterval(){ TypeBase.apply(this, arguments); }
 TypeStore.type.interval.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.interval.prototype.typeDbPg='interval';
 TypeStore.type.interval.prototype.pgSpecialParse=true;
@@ -373,7 +382,7 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
     });
     return bestGlobals.timeInterval(interval);
 };
-TypeStore.type.interval.prototype.validateTypedData=function validateTypedData(object){
+TypeStore.type.interval.prototype.isValidTypedData=function isValidTypedData(object){
     return object===null || object instanceof bestGlobals.TimeInterval;
     // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
 };
@@ -400,7 +409,7 @@ TypeStore.type.timestamp.prototype.pg_OID=1114;
 TypeStore.type.timestamp.prototype.fromString=function fromString(text){
     return bestGlobals.datetime.iso(text);
 };
-TypeStore.type.timestamp.prototype.validateTypedData=function validateTypedData(object){
+TypeStore.type.timestamp.prototype.isValidTypedData=function isValidTypedData(object){
     return object===null || object instanceof bestGlobals.Datetime;
 };
 TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedValue){
@@ -448,8 +457,11 @@ json4all.addType(Big,{
 
 bestGlobals.registerJson4All(json4all);
 
-likeAr(TypeStore.type).forEach(function(typeDef, typeName){
-    typeDef.prototype.typeName = typeName;
+likeAr(TypeStore.type).forEach(function(typer, typeName){
+    typer.prototype.typeName = typeName;
+    if(!typer.prototype.hasOwnProperty('constructor')){
+        typer.prototype.constructor = typer;
+    }
     /*
     json4all.addType(typeName,{
         construct: function construct(value){ 
