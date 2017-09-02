@@ -19,12 +19,13 @@ function ignoreTypeInfoAndThrow(obtained, expected){
 }
 
 TypeStore.messages = TypeStore.messages.es;
+TypeStore.locale = TypeStore.locale.es;
 
 describe("fixtures", function(){
   [
       {typeName:'boolean', fixtures:[
-          {fromString:'s', value:true, toPlainString:'true', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
-          {fromString:'f', value:false, toPlainString:'false', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
+          {fromString:'s', value:true , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
+          {fromString:'f', value:false, toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
           {fromString:null, value:null, toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
       ]},
       {typeName:'text', fixtures:[
@@ -42,8 +43,8 @@ describe("fixtures", function(){
       ]},
       {typeName:'decimal', fixtures:[
           {fromString:'2147483646', value:2147483646, toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'></span><span class='number-miles'>147</span><span class='number-separator'></span><span class='number-miles'>483</span><span class='number-separator'></span><span class='number-miles'>646</span></span>"},
-          {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>.</span><span class='number-decimals'>3</span></span>"},
-          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001')}
+          {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
+          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2147483648,010000000001'}
       ]},
       {typeName:'ARRAY:text', fixtures:[
           {fromString:'a;b;cc', toPlainString:'a;b;cc', value:['a','b','cc']},
@@ -67,7 +68,7 @@ describe("fixtures", function(){
           {fromString:'5'       , toPlainString:'5:00:00'},
       ]},
       {typeName:'date', fixtures:[
-          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
+          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
           {fromString:'4'       , fromStringError:new Error('invalid date')},
       ], constructorFunction:bestGlobals.datetime},
       {typeName:'timestamp', fixtures:[
@@ -77,16 +78,16 @@ describe("fixtures", function(){
   ].forEach(function(typeDef){
     if(!typeDef.skip){
       describe(typeDef.typeName+' '+(typeDef.describeFixtures||''), function(){
-        var typeActual = new TypeStore.type[typeDef.typeName]();
+        var typer = new TypeStore.type[typeDef.typeName]();
         likeAr(typeDef).forEach(function(value, attr){
-            typeActual[attr]=value;
+            typer[attr]=value;
         });
         typeDef.fixtures.forEach(function(fixture){
           if(!fixture.skip){
             it("accept \""+fixture.fromString+"\"", function(){
               if(fixture.fromStringError){
                 try{
-                  var obtainedFromString = typeActual.fromString(fixture.fromString);
+                  var obtainedFromString = typer.fromString(fixture.fromString);
                 }catch(err){
                   var obtainedError = err;
                 }
@@ -96,14 +97,14 @@ describe("fixtures", function(){
                 var obtainedFromConstructor;
                 var obtained;
                 if('fromString' in fixture){
-                    obtained = obtainedFromString = typeActual.fromString(fixture.fromString);
+                    obtained = obtainedFromString = typer.fromString(fixture.fromString);
                 }
                 if('construct' in fixture){
                     obtainedFromConstructor = typeDef.constructorFunction(fixture.construct);
                     obtained = obtainedFromConstructor;
                 }
-                typeActual.validateTypedData(null);
-                typeActual.validateTypedData(obtained);
+                typer.validateTypedData(null);
+                typer.validateTypedData(obtained);
                 if('fromString' in fixture && 'construct' in fixture){
                     discrepances.showAndThrow(obtainedFromString, obtainedFromConstructor);
                 }
@@ -125,12 +126,24 @@ describe("fixtures", function(){
                     throw err;
                 }
                 if('toPlainString' in fixture){
-                    var obtainedOutput=typeActual.toPlainString(obtained);
+                    var obtainedOutput=typer.toPlainString(obtained);
                     discrepances.showAndThrow(obtainedOutput, fixture.toPlainString);
                 }
                 if('toHtmlText' in fixture){
-                    var obtainedOutput=typeActual.toHtmlText(obtained);
+                    var obtainedOutput=typer.toHtmlText(obtained);
                     discrepances.showAndThrow(obtainedOutput, fixture.toHtmlText);
+                }
+                if('local' in fixture){
+                    var localObtained=typer.toLocalString(obtained);
+                    discrepances.showAndThrow(localObtained, fixture.local);
+                }
+                if('local' in fixture){
+                    var localObtained=typer.fromLocalString(fixture.local);
+                    discrepances.showAndThrow(localObtained, obtained);
+                }
+                if('fromLocal' in fixture){
+                    var localObtained=typer.fromLocalString(fixture.fromLocal);
+                    discrepances.showAndThrow(localObtained, obtained);
                 }
               }
             });
@@ -140,7 +153,7 @@ describe("fixtures", function(){
             it("reject \""+invalidValue+"\"", function(){
                 var obtained;
                 try{
-                    typeActual.validateTypedData(invalidValue);
+                    typer.validateTypedData(invalidValue);
                 }catch(err){
                     obtained=err;
                 }

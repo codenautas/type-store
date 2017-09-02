@@ -59,10 +59,25 @@ Big.prototype.sameValue=function(other){
     return other instanceof Big && this.toString() == other.toString();
 };
 
-TypeStore.options={
+TypeStore.locale={
     number:{
         decimalSeparator:'.',
         milesSeparator:''
+    },
+    datetime:{
+        dateSeparator:'-',
+        dateOrder:['month','day','year'],
+    }
+}
+
+TypeStore.locale.es={
+    number:{
+        decimalSeparator:',',
+        milesSeparator:''
+    },
+    datetime:{
+        dateSeparator:'/',
+        dateOrder:['day','month','year'],
     }
 }
         
@@ -108,6 +123,12 @@ TypeBase.prototype.validateTypedData=function validateTypedData(typedData){
     }
     return true;
 };
+TypeBase.prototype.toLocalString=function toLocalString(typedData){
+    return this.toPlainString(typedData);
+};
+TypeBase.prototype.fromLocalString=function toLocalString(textWithLocalValue){
+    return this.fromString(textWithLocalValue);
+};
 
 TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); }
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
@@ -119,10 +140,13 @@ TypeStore.type.boolean.prototype.toPlainString=function toPlainString(typedValue
 };
 TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
     var falseInitials={'n':true,'N':true,'0':true,'2':true,'F':true,'f':true,'\u043d':true,'\u041d':true,'\u0147':true,'\u0148':true};
-    return textWithValue==null?null:!falseInitials[textWithValue];
+    return textWithValue==null?null:!falseInitials[textWithValue[0]];
+};
+TypeStore.type.boolean.prototype.toLocalString=function toLocalString(typedValue){
+    return TypeStore.messages.boolean[typedValue];
 };
 TypeStore.type.boolean.prototype.toHtml=function toHtmlBoolean(typedValue){
-    return html.span({"class": "boolean"},[html.span({"class": "boolean-"+typedValue},TypeStore.messages.boolean[typedValue])]);
+    return html.span({"class": "boolean"},[html.span({"class": "boolean-"+typedValue},this.toLocalString(typedValue))]);
 };
 TypeStore.type.boolean.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'boolean';
@@ -153,45 +177,69 @@ TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedDa
     return typedData==null || typeof typedData === 'string';
 };
 
-TypeStore.type.number = function TypeNumber(){ TypeBase.apply(this, arguments); }
-TypeStore.type.number.prototype = Object.create(TypeBase.prototype);
-TypeStore.type.number.prototype.typeDbPg='double precision';
-TypeStore.type.number.prototype.typedControlName='number';
-TypeStore.type.number.prototype.pgSpecialParse=false;
-TypeStore.type.number.prototype.inexactNumber=true;
-TypeStore.type.number.prototype.pg_OID=701;
-TypeStore.type.number.prototype.toPlainString=function toPlainString(typedValue){
+TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); }
+TypeStore.typeNumber.prototype = Object.create(TypeBase.prototype);
+TypeStore.typeNumber.prototype.typedControlName='number';
+TypeStore.typeNumber.prototype.pgSpecialParse=false;
+TypeStore.typeNumber.prototype.inexactNumber=true;
+TypeStore.typeNumber.prototype.pg_OID=701;
+TypeStore.typeNumber.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toString();
 };
-TypeStore.type.number.prototype.toHtml=function toHtmlNumber(typedValue){
+TypeStore.typeNumber.prototype.toLocalParts=function toHtmlNumber(typedValue,fPart,fParts){
     var str = this.toPlainString(typedValue);
     var rta = [];
     str.replace(/^([-+]?[0-9 ]+)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
         left.replace(/^([-+]?)([0-9][0-9]?[0-9]?)(([0-9][0-9][0-9])*)$/, function(str, sign, prefix, triplets){
             if(sign=='-'){
-                rta.push(html.span({class: "number-sign"}, sign));
+                rta.push(fPart(sign,"number-sign"));
             }
-            rta.push(html.span({"class": "number-miles"}, prefix));
+            rta.push(fPart(prefix,"number-miles"));
             triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
-                rta.push(html.span({"class": "number-separator"},TypeStore.options.number.milesSeparator));
-                rta.push(html.span({"class": "number-miles"}, triplet));
+                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator"));
+                rta.push(fPart(triplet,"number-miles"));
             });
         });
         if(dot){
-            rta.push(html.span({"class": "number-dot"},TypeStore.options.number.decimalSeparator));
+            rta.push(fPart(TypeStore.locale.number.decimalSeparator,"number-dot"));
         }
         if(decimals){
-            rta.push(html.span({"class": "number-decimals"},decimals));
+            rta.push(fPart(decimals,"number-decimals"));
         }
     });
-    return html.span({"class": "number"}, rta);
+    return fParts(rta,"number");
 };
-TypeStore.type.number.prototype.isValidTypedData=function isValidTypedData(typedData){
+TypeStore.typeNumber.prototype.toHtml=function toHtmlNumber(typedValue){
+    return this.toLocalParts(
+        typedValue,
+        function Part(part, className){
+            return html.span({class:className}, part);
+        },
+        function Parts(parts, className){
+            return html.span({class:className}, parts);
+        }
+    );
+};
+TypeStore.typeNumber.prototype.toLocalString=function toLocalString(typedValue){
+    return this.toLocalParts(
+        typedValue,
+        function Part(part){return part;},
+        function Parts(parts){return parts.join('');}
+    );
+};
+TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
 };
 
-TypeStore.type.hugeint = function TypeHugint(){ TypeStore.type.number.apply(this, arguments); }
-TypeStore.type.hugeint.prototype=Object.create(TypeStore.type.number.prototype);
+TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); }
+TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
+TypeStore.type.double.prototype.typeDbPg='double precision';
+TypeStore.type.double.prototype.fromString=function fromString(textWithHugeInt){
+    return Number(textWithHugeInt);
+};
+
+TypeStore.type.hugeint = function TypeHugint(){ TypeStore.typeNumber.apply(this, arguments); }
+TypeStore.type.hugeint.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.hugeint.prototype.maxBig= 1000000000000000;
 TypeStore.type.hugeint.prototype.minBig=-1000000000000000;
 TypeStore.type.hugeint.prototype.typeDbPg='numeric(1000)';
@@ -225,8 +273,8 @@ TypeStore.type.bigint.prototype.minValue= -9223372036854775808;
 TypeStore.type.bigint.prototype.typeDbPg='bigint';
 TypeStore.type.bigint.prototype.pg_OID=20;
 
-TypeStore.type.decimal=function TypeDecimal(){ TypeStore.type.number.apply(this,arguments); }
-TypeStore.type.decimal.prototype=Object.create(TypeStore.type.number.prototype);
+TypeStore.type.decimal=function TypeDecimal(){ TypeStore.typeNumber.apply(this,arguments); }
+TypeStore.type.decimal.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.decimal.prototype.maxBigLength= 10,
 TypeStore.type.decimal.prototype.typeDbPg='numeric';
 TypeStore.type.decimal.prototype.typedControlName='number';
