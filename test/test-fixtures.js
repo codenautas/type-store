@@ -103,8 +103,6 @@ describe("fixtures", function(){
                     obtainedFromConstructor = typeDef.constructorFunction(fixture.construct);
                     obtained = obtainedFromConstructor;
                 }
-                typer.validateTypedData(null);
-                typer.validateTypedData(obtained);
                 if('fromString' in fixture && 'construct' in fixture){
                     discrepances.showAndThrow(obtainedFromString, obtainedFromConstructor);
                 }
@@ -115,6 +113,8 @@ describe("fixtures", function(){
                         obtained = fixture.value;
                     }
                 }
+                typer.validateTypedData(null);
+                typer.validateTypedData(obtained);
                 try{
                     var jsonText=json4all.stringify(obtained);
                     var jsonObtained=json4all.parse(jsonText);

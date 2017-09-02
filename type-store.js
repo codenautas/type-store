@@ -66,7 +66,7 @@ TypeStore.locale={
     },
     datetime:{
         dateSeparator:'-',
-        dateOrder:['month','day','year'],
+        partsOrder:['month','day','year'],
     }
 }
 
@@ -77,7 +77,7 @@ TypeStore.locale.es={
     },
     datetime:{
         dateSeparator:'/',
-        dateOrder:['day','month','year'],
+        partsOrder:['day','month','year'],
     }
 }
         
@@ -100,9 +100,20 @@ TypeBase.prototype.toHtmlText = function toHtmlText(value){
     return this.toHtml(value).toHtmlText();
 }
 TypeBase.prototype.toHtml=function toHtml(typedValue){
-    var self = this;
-    var x=self.toPlainString(typedValue);
-    return html.span({class:self.typeName}, x);
+    if(this.toLocalParts){
+        return this.toLocalParts(
+            typedValue,
+            function Part(part, className){
+                return html.span({class:className}, part);
+            },
+            function Parts(parts, className){
+                return html.span({class:className}, parts);
+            }
+        );
+    }else{
+        var x=this.toPlainString(typedValue);
+        return html.span({class:this.typeName}, x);
+    }
 };
 TypeBase.prototype.toExcelValue=function toExcelValue(typedValue){
     return this.toPlainString(typedValue);
@@ -123,8 +134,16 @@ TypeBase.prototype.validateTypedData=function validateTypedData(typedData){
     }
     return true;
 };
-TypeBase.prototype.toLocalString=function toLocalString(typedData){
-    return this.toPlainString(typedData);
+TypeBase.prototype.toLocalString=function toLocalString(typedValue){
+    if(this.toLocalParts){
+        return this.toLocalParts(
+            typedValue,
+            function Part(part){return part;},
+            function Parts(parts){return parts.join('');}
+        );
+    }else{
+        return this.toPlainString(typedData);
+    }
 };
 TypeBase.prototype.fromLocalString=function toLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue);
@@ -208,24 +227,6 @@ TypeStore.typeNumber.prototype.toLocalParts=function toHtmlNumber(typedValue,fPa
         }
     });
     return fParts(rta,"number");
-};
-TypeStore.typeNumber.prototype.toHtml=function toHtmlNumber(typedValue){
-    return this.toLocalParts(
-        typedValue,
-        function Part(part, className){
-            return html.span({class:className}, part);
-        },
-        function Parts(parts, className){
-            return html.span({class:className}, parts);
-        }
-    );
-};
-TypeStore.typeNumber.prototype.toLocalString=function toLocalString(typedValue){
-    return this.toLocalParts(
-        typedValue,
-        function Part(part){return part;},
-        function Parts(parts){return parts.join('');}
-    );
 };
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
@@ -386,14 +387,25 @@ TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(object)
 TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
 };
-TypeStore.type.date.prototype.toHtml=function toHtmlDate(typedValue){
+TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
+    var part={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()}
     var parts=[];
-    parts.push(html.span({"class":"date-day"},typedValue.getDate()));
-    parts.push(html.span({"class":"date-sep"},'/'));
-    parts.push(html.span({"class":"date-month"},typedValue.getMonth()+1));
-    parts.push(html.span({"class":"date-sep"},'/'));
-    parts.push(html.span({"class":"date-year"},typedValue.getFullYear()));
-    return html.span({"class":"date"}, parts);
+    TypeStore.locale.datetime.partsOrder.forEach(function(partName, i){
+        if(i){
+            parts.push(fPart(TypeStore.locale.datetime.dateSeparator,"date-sep"));
+        }
+        parts.push(fPart(part[partName],"date-"+partName));
+    });
+    return fParts(parts, "date");
+}
+TypeStore.type.date.prototype.fromLocalString=function toLocalString(textWithLocalValue){
+    var arr=[0,0,0];
+    var partsPositions={year:0, month:1, day:2};
+    var i=0;
+    textWithLocalValue.replace(/\d+/g, function(number){
+        arr[partsPositions[TypeStore.locale.datetime.partsOrder[i++]]]=Number(number);
+    });
+    return bestGlobals.date.array(arr);
 };
 
 TypeStore.type.interval = function TypeArrayInterval(){ TypeBase.apply(this, arguments); }
