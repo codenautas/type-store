@@ -29,7 +29,7 @@ describe("fixtures", function(){
           {fromString:null, value:null, toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
       ]},
       {typeName:'text', fixtures:[
-          {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
+          {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
           {fromString:'', value:'', toPlainString:'', toHtmlText:"<span class=text><span class='text-empty'></span></span>"},
           {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
       ]},
@@ -45,7 +45,10 @@ describe("fixtures", function(){
           {fromString:'2147483646', value:2147483646, toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'></span><span class='number-miles'>147</span><span class='number-separator'></span><span class='number-miles'>483</span><span class='number-separator'></span><span class='number-miles'>646</span></span>"},
           {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
           {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2147483648,010000000001'}
-      ]},
+      ], invalidValues:['x', new Date()]},
+      {typeName:'double', fixtures:[
+          {fromString:'2.3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
+      ], invalidValues:['9.3']},
       {typeName:'ARRAY:text', fixtures:[
           {fromString:'a;b;cc', toPlainString:'a;b;cc', value:['a','b','cc']},
           {fromString:'a;b', toHtmlText:"<span class=array><span class='array-element'>a</span><span class='array-separator'>;</span><span class='array-element'>b</span></span>"},
@@ -70,7 +73,9 @@ describe("fixtures", function(){
       {typeName:'date', fixtures:[
           {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
           {fromString:'4'       , fromStringError:new Error('invalid date')},
-      ], constructorFunction:bestGlobals.datetime},
+      ], constructorFunction:bestGlobals.date.iso
+      , invalidValues:[7 , [7], '2017-12-12 10:30:45', new Date()+1000,'2017-12-23',"2017-09-02T15:08:16.318Z"]
+      , invalidLocales:['2017-12-30']},
       {typeName:'timestamp', fixtures:[
           {fromString:'2017-12-23 13:40:00', toPlainString:'2017-12-23 13:40:00.000', value:bestGlobals.datetime.iso('2017-12-23 13:40:00')},
           {fromString:'4'       , fromStringError:new Error('invalid datetime')},
@@ -158,9 +163,14 @@ describe("fixtures", function(){
                     obtained=err;
                 }
                 discrepances.showAndThrow(obtained instanceof Error,true);
-                if(!/No[nt] an? /.test(obtained.message)){
+                if(!/[Nn]o[nt] an? /.test(obtained.message)){
                     discrepances.showAndThrow(obtained.message,"/No[nt] an? /");
                 }
+            });
+        });
+        (typeDef.invalidLocales||[]).forEach(function(invalidLocal){
+            it("reject local \""+invalidLocal+"\"", function(){
+                discrepances.showAndThrow(typer.isValidLocalString(invalidLocal),false);
             });
         });
       });

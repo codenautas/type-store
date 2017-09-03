@@ -142,12 +142,26 @@ TypeBase.prototype.toLocalString=function toLocalString(typedValue){
             function Parts(parts){return parts.join('');}
         );
     }else{
-        return this.toPlainString(typedData);
+        return this.toPlainString(typedValue);
     }
 };
 TypeBase.prototype.fromLocalString=function toLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue);
 };
+TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalValue){
+    try{
+        var typedValue = this.fromLocalString(textWithLocalValue);
+        return this.isValidTypedData(typedValue);
+    }catch(err){
+        return false;
+    }
+};
+TypeBase.prototype.getDomFixtures=function getDomFixtures(){
+    return [
+        {tagName:'div'},
+        {tagName:'input', type:'text'}
+    ];
+}
 
 TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); }
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
@@ -203,9 +217,10 @@ TypeStore.typeNumber.prototype.pgSpecialParse=false;
 TypeStore.typeNumber.prototype.inexactNumber=true;
 TypeStore.typeNumber.prototype.pg_OID=701;
 TypeStore.typeNumber.prototype.toPlainString=function toPlainString(typedValue){
+    console.log('xxxxxxxxxxxxx-toPlainString',typedValue,typedValue.toString());
     return typedValue.toString();
 };
-TypeStore.typeNumber.prototype.toLocalParts=function toHtmlNumber(typedValue,fPart,fParts){
+TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPart,fParts){
     var str = this.toPlainString(typedValue);
     var rta = [];
     str.replace(/^([-+]?[0-9 ]+)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
@@ -231,12 +246,20 @@ TypeStore.typeNumber.prototype.toLocalParts=function toHtmlNumber(typedValue,fPa
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
 };
+TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
+    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', type:'number'});
+}
 
 TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); }
 TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.double.prototype.typeDbPg='double precision';
-TypeStore.type.double.prototype.fromString=function fromString(textWithHugeInt){
-    return Number(textWithHugeInt);
+TypeStore.type.double.prototype.fromString=function fromString(textWithNumber){
+    var answer = Number(textWithNumber);
+    if(isNaN(answer) && typeof textWithNumber == "string" && /^\s*\d+,\d+\s*$/.test(textWithNumber)){
+        return Number(textWithNumber.replace(',','.'));
+    }else{
+        return answer;
+    }
 };
 
 TypeStore.type.hugeint = function TypeHugint(){ TypeStore.typeNumber.apply(this, arguments); }
@@ -473,9 +496,6 @@ TypeStore.type.timestamp.prototype.isValidTypedData=function isValidTypedData(ob
     return object===null || object instanceof bestGlobals.Datetime;
 };
 TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedValue){
-    if(typedValue.toYmdHmsM==null){
-        console.log('xxxxxxx typedValue', typedValue, typedValue.constructor.name, typedValue.toYmdHmsM);
-    }
     return typedValue.toYmdHmsM();
 };
 
