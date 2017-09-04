@@ -113,7 +113,7 @@ TypeBase.prototype.toHtml=function toHtml(typedValue){
     }else{
         var x=this.toPlainString(typedValue);
         return html.span({class:this.typeName}, x);
-    }
+    }s
 };
 TypeBase.prototype.toExcelValue=function toExcelValue(typedValue){
     return this.toPlainString(typedValue);
@@ -128,9 +128,16 @@ TypeBase.prototype.typedControlName='FROM:type-store';
 TypeBase.prototype.isValidTypedData=function isValidTypedData(typedData){
     return false;
 };
-TypeBase.prototype.validateTypedData=function validateTypedData(typedData){
+TypeBase.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(typedData){
     if(!this.isValidTypedData(typedData)){
-        throw new Error('not a '+this.typeName+' in input');
+        return 'not a '+this.typeName+' in input';
+    }
+    return null;
+};
+TypeBase.prototype.validateTypedData=function validateTypedData(typedData){
+    var why=this.whyTypedDataIsInvalid(typedData);
+    if(why){
+        throw new Error(why);
     }
     return true;
 };
@@ -158,8 +165,8 @@ TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalV
 };
 TypeBase.prototype.getDomFixtures=function getDomFixtures(){
     return [
-        {tagName:'div'},
-        {tagName:'input', type:'text'}
+        {tagName:'div', attributes:{}},
+        {tagName:'input', attributes:{type:'text'}}
     ];
 }
 
@@ -207,7 +214,24 @@ TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     return html.span({"class": "text"}, answer);
 };
 TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedData){
-    return typedData==null || typeof typedData === 'string';
+    return typedData==null || typeof typedData === 'string' && (
+        typedData!='' || this.allowEmptyText
+    );
+};
+TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(typedData){
+    if(typedData==null || typeof typedData === 'string'){
+        if(!this.allowEmptyText && typedData===''){
+            return 'text cannot be empty';
+        }else{
+            return null;
+        }
+    }
+    return 'not a text in input';
+};
+TypeStore.type.text.prototype.ValidateTypedData=function isValidTypedData(typedData){
+    return typedData==null || typeof typedData === 'string' && (
+        typedData!='' || this.allowEmptyText
+    );
 };
 
 TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); }
@@ -217,7 +241,6 @@ TypeStore.typeNumber.prototype.pgSpecialParse=false;
 TypeStore.typeNumber.prototype.inexactNumber=true;
 TypeStore.typeNumber.prototype.pg_OID=701;
 TypeStore.typeNumber.prototype.toPlainString=function toPlainString(typedValue){
-    console.log('xxxxxxxxxxxxx-toPlainString',typedValue,typedValue.toString());
     return typedValue.toString();
 };
 TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPart,fParts){
@@ -246,9 +269,9 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
 };
-TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
-    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', type:'number'});
-}
+//TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
+//    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', attributes:{type:'number'}});
+//}
 
 TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); }
 TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
@@ -404,8 +427,20 @@ TypeStore.type.date.prototype.typeDbPg='date';
 TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
-TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(object){
-    return object===null || object instanceof Date;
+TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(object){
+    if(object==null){
+        return null;
+    }
+    if(!(object instanceof Date)){
+        return 'Not a date in input';
+    }
+    if(!object.isRealDate){
+        try{
+            bestGlobals.date(object);
+        }catch(err){
+            return err.message;
+        }
+    }
 };
 TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
@@ -562,6 +597,10 @@ TypeStore.completeTypeInfo = function(typeInfo){
             }
         });
     }
+}
+
+TypeStore.typerFrom = function typerFrom(typeInfo){
+    return new TypeStore.type[typeInfo.typeName](typeInfo);
 }
 
 return TypeStore;
