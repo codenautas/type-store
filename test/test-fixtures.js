@@ -30,9 +30,13 @@ describe("fixtures", function(){
       ]},
       {typeName:'text', fixtures:[
           {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
+          {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
+      ], invalidValues:[1, new Date(), /x/, {value:'', expectedError:/text cannot be empty/i}]},
+      {typeName:'text', fixtures:[
+          {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
           {fromString:'', value:'', toPlainString:'', toHtmlText:"<span class=text><span class='text-empty'></span></span>"},
           {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
-      ]},
+      ], typeInfo:{typeName:'text', allowEmptyText:true}},
       {typeName:'hugeint', fixtures:[
       ]},
       {typeName:'integer', fixtures:[
@@ -72,9 +76,10 @@ describe("fixtures", function(){
       ]},
       {typeName:'date', fixtures:[
           {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
+          /* {fromString:'2017-12-23', toPlainString:'2017-12-23', value:new Date(2017,11,23,0,0,0), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},*/
           {fromString:'4'       , fromStringError:new Error('invalid date')},
       ], constructorFunction:bestGlobals.date.iso
-      , invalidValues:[7 , [7], '2017-12-12 10:30:45', new Date()+1000,'2017-12-23',"2017-09-02T15:08:16.318Z"]
+      , invalidValues:[7 , [7], '2017-12-12 10:30:45', new Date(),'2017-12-23',"2017-09-02T15:08:16.318Z"]
       , invalidLocales:['2017-12-30']},
       {typeName:'timestamp', fixtures:[
           {fromString:'2017-12-23 13:40:00', toPlainString:'2017-12-23 13:40:00.000', value:bestGlobals.datetime.iso('2017-12-23 13:40:00')},
@@ -83,7 +88,7 @@ describe("fixtures", function(){
   ].forEach(function(typeDef){
     if(!typeDef.skip){
       describe(typeDef.typeName+' '+(typeDef.describeFixtures||''), function(){
-        var typer = new TypeStore.type[typeDef.typeName]();
+        var typer = TypeStore.typerFrom(typeDef.typeInfo||{typeName:typeDef.typeName});
         likeAr(typeDef).forEach(function(value, attr){
             typer[attr]=value;
         });
@@ -141,6 +146,7 @@ describe("fixtures", function(){
                 if('local' in fixture){
                     var localObtained=typer.toLocalString(obtained);
                     discrepances.showAndThrow(localObtained, fixture.local);
+                    discrepances.showAndThrow(typer.isValidLocalString(localObtained),true,{showContext:'local:'+localObtained});
                 }
                 if('local' in fixture){
                     var localObtained=typer.fromLocalString(fixture.local);
@@ -154,8 +160,10 @@ describe("fixtures", function(){
             });
           }
         });
-        (typeDef.invalidValues||[]).forEach(function(invalidValue){
-            it("reject \""+invalidValue+"\"", function(){
+        (typeDef.invalidValues||[]).forEach(function(invalidFixture){
+            it("reject "+JSON.stringify(invalidFixture), function(){
+                var invalidValue = invalidFixture && invalidFixture.expectedError?invalidFixture.value:invalidFixture;
+                var expectedError = invalidFixture && invalidFixture.expectedError?invalidFixture.expectedError:/No[nt] an? /i;
                 var obtained;
                 try{
                     typer.validateTypedData(invalidValue);
@@ -163,8 +171,8 @@ describe("fixtures", function(){
                     obtained=err;
                 }
                 discrepances.showAndThrow(obtained instanceof Error,true);
-                if(!/[Nn]o[nt] an? /.test(obtained.message)){
-                    discrepances.showAndThrow(obtained.message,"/No[nt] an? /");
+                if(!expectedError.test(obtained.message)){
+                    discrepances.showAndThrow(obtained.message,expectedError.toString());
                 }
             });
         });

@@ -90,7 +90,10 @@ TypeStore.class.Big.prototype.toLiteral=function(){
     return this.toString();
 };
 
-function TypeBase(){};
+function TypeBase(typeInfo){
+    this.typeInfo=typeInfo||{};
+    this.typeInfo.typeName=this.typeInfo.typeName||this.typeName;
+};
 TypeBase.prototype.setTypeInfo = function setTypeInfo(value){
     if(value instanceof Object){
         //value.typeInfo=this;
@@ -113,18 +116,22 @@ TypeBase.prototype.toHtml=function toHtml(typedValue){
     }else{
         var x=this.toPlainString(typedValue);
         return html.span({class:this.typeName}, x);
-    }s
+    }
 };
+/* istanbul ignore next */
 TypeBase.prototype.toExcelValue=function toExcelValue(typedValue){
     return this.toPlainString(typedValue);
 };
+/* istanbul ignore next */
 TypeBase.prototype.toExcelType=function toExcelType(typedValue){
     return 's';
 };
+/* istanbul ignore next */
 TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
     return this.fromString(cell.w);
 };
 TypeBase.prototype.typedControlName='FROM:type-store';
+/* istanbul ignore next */
 TypeBase.prototype.isValidTypedData=function isValidTypedData(typedData){
     return false;
 };
@@ -158,11 +165,13 @@ TypeBase.prototype.fromLocalString=function toLocalString(textWithLocalValue){
 TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalValue){
     try{
         var typedValue = this.fromLocalString(textWithLocalValue);
-        return this.isValidTypedData(typedValue);
+        this.validateTypedData(typedValue);
+        return true;
     }catch(err){
         return false;
     }
 };
+/* istanbul ignore next */
 TypeBase.prototype.getDomFixtures=function getDomFixtures(){
     return [
         {tagName:'div', attributes:{}},
@@ -192,7 +201,7 @@ TypeStore.type.boolean.prototype.isValidTypedData=function isValidTypedData(type
     return typedData==null || typeof typedData === 'boolean';
 };
 
-TypeStore.type.text = function TypeText(){ TypeBase.apply(this, arguments); }
+TypeStore.type.text = function TypeText(typeInfo){ TypeBase.apply(this, arguments); }
 TypeStore.type.text.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.text.prototype.typeDbPg='text';
 TypeStore.type.text.prototype.typedControlName='text';
@@ -213,25 +222,20 @@ TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     }
     return html.span({"class": "text"}, answer);
 };
+/*
 TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedData){
-    return typedData==null || typeof typedData === 'string' && (
-        typedData!='' || this.allowEmptyText
-    );
+    return 
 };
+*/
 TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(typedData){
     if(typedData==null || typeof typedData === 'string'){
-        if(!this.allowEmptyText && typedData===''){
+        if(!this.typeInfo.allowEmptyText && typedData===''){
             return 'text cannot be empty';
         }else{
             return null;
         }
     }
     return 'not a text in input';
-};
-TypeStore.type.text.prototype.ValidateTypedData=function isValidTypedData(typedData){
-    return typedData==null || typeof typedData === 'string' && (
-        typedData!='' || this.allowEmptyText
-    );
 };
 
 TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); }
@@ -435,12 +439,17 @@ TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInval
         return 'Not a date in input';
     }
     if(!object.isRealDate){
+        return 'Not a real date in input';
+        /*
         try{
             bestGlobals.date(object);
+            return null;
         }catch(err){
             return err.message;
         }
+        */
     }
+    return null;
 };
 TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
@@ -491,6 +500,7 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
         stringWithInterval=stringWithInterval+typeInfo.timeUnit;
     }
     var matches=stringWithInterval.match(self.regExp);
+    /* istanbul ignore next */
     if(!matches) return null;
     var interval={};
     self.partDefs.forEach(function(partDef, i){
@@ -574,6 +584,7 @@ bestGlobals.registerJson4All(json4all);
 
 likeAr(TypeStore.type).forEach(function(typer, typeName){
     typer.prototype.typeName = typeName;
+    /* istanbul ignore next */
     if(!typer.prototype.hasOwnProperty('constructor')){
         typer.prototype.constructor = typer;
     }
@@ -589,6 +600,7 @@ likeAr(TypeStore.type).forEach(function(typer, typeName){
     */
 });
 
+/* istanbul ignore next */
 TypeStore.completeTypeInfo = function(typeInfo){
     if(typeInfo.typeName in TypeStore.type){
         likeAr(TypeStore.type[typeInfo.typeName]).forEach(function(value, attr){

@@ -21,7 +21,7 @@
     "mocha": "~3.5.0",
     "postgres-interval": "~1.1.1",
     
-    "discrepances": "~0.2.1",
+    "discrepances": "~0.2.2",
     "like-ar": "~0.2.2"
   },
   "engines": {
