@@ -599,6 +599,8 @@ TypeStore.completeTypeInfo = function(typeInfo){
     }
 }
 
+TypeStore.TypeBase = TypeBase;
+
 TypeStore.typerFrom = function typerFrom(typeInfo){
     return new TypeStore.type[typeInfo.typeName](typeInfo);
 }
