@@ -181,8 +181,8 @@ TypeBase.prototype.getDomFixtures=function getDomFixtures(){
 
 TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); }
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
-TypeStore.type.boolean.prototype.typeDbPg='text';
-TypeStore.type.boolean.prototype.typedControlName='text';
+TypeStore.type.boolean.prototype.typeDbPg='boolean';
+TypeStore.type.boolean.prototype.typedControlName='boolean';
 TypeStore.type.boolean.prototype.pgSpecialParse=false;
 TypeStore.type.boolean.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue+'';
