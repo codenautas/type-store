@@ -20,11 +20,9 @@
 })(/*jshint -W040 */this, 'PostgresInterval', function() {
 /*jshint +W040 */
 
-function PostgresInterval(){};
+function PostgresInterval(){}
 
 PostgresInterval["4client"]=true;
-
-PostgresInterval.prototype.
 
 return PostgresInterval;
 

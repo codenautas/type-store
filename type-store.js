@@ -68,7 +68,7 @@ TypeStore.locale={
         dateSeparator:'-',
         partsOrder:['month','day','year'],
     }
-}
+};
 
 TypeStore.locale.es={
     number:{
@@ -79,7 +79,7 @@ TypeStore.locale.es={
         dateSeparator:'/',
         partsOrder:['day','month','year'],
     }
-}
+};
         
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
@@ -93,18 +93,18 @@ TypeStore.class.Big.prototype.toLiteral=function(){
 function TypeBase(typeInfo){
     this.typeInfo=typeInfo||{};
     this.typeInfo.typeName=this.typeInfo.typeName||this.typeName;
-};
-TypeBase.prototype.charRejecter = function charRejecter(char, position){
-    return false;
 }
+TypeBase.prototype.rejectedChar = function rejectedChar(char, position){
+    return false;
+};
 TypeBase.prototype.setTypeInfo = function setTypeInfo(value){
     if(value instanceof Object){
         //value.typeInfo=this;
     }
-}
+};
 TypeBase.prototype.toHtmlText = function toHtmlText(value){
     return this.toHtml(value).toHtmlText();
-}
+};
 TypeBase.prototype.toHtml=function toHtml(typedValue){
     if(this.toLocalParts){
         return this.toLocalParts(
@@ -180,9 +180,9 @@ TypeBase.prototype.getDomFixtures=function getDomFixtures(){
         {tagName:'div', attributes:{}},
         {tagName:'input', attributes:{type:'text'}}
     ];
-}
+};
 
-TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); }
+TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); };
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.boolean.prototype.typeDbPg='boolean';
 TypeStore.type.boolean.prototype.typedControlName='boolean';
@@ -192,7 +192,7 @@ TypeStore.type.boolean.prototype.toPlainString=function toPlainString(typedValue
 };
 TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
     var falseInitials={'n':true,'N':true,'0':true,'2':true,'F':true,'f':true,'\u043d':true,'\u041d':true,'\u0147':true,'\u0148':true};
-    return textWithValue==null?null:!falseInitials[textWithValue[0]];
+    return !falseInitials[textWithValue[0]];
 };
 TypeStore.type.boolean.prototype.toLocalString=function toLocalString(typedValue){
     return TypeStore.messages.boolean[typedValue];
@@ -204,7 +204,7 @@ TypeStore.type.boolean.prototype.isValidTypedData=function isValidTypedData(type
     return typedData==null || typeof typedData === 'boolean';
 };
 
-TypeStore.type.text = function TypeText(typeInfo){ TypeBase.apply(this, arguments); }
+TypeStore.type.text = function TypeText(typeInfo){ TypeBase.apply(this, arguments); };
 TypeStore.type.text.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.text.prototype.typeDbPg='text';
 TypeStore.type.text.prototype.typedControlName='text';
@@ -218,10 +218,10 @@ TypeStore.type.text.prototype.fromString=function fromString(textWithValue){
 TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     var answer=typedValue;
     if(typedValue===''){
-        answer=html.span({"class": "text-empty"})
+        answer=html.span({"class": "text-empty"});
     }
     if(typedValue==null){
-        answer=html.span({"class": "text-null"})
+        answer=html.span({"class": "text-null"});
     }
     return html.span({"class": "text"}, answer);
 };
@@ -241,14 +241,17 @@ TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(ty
     return 'not a text in input';
 };
 
-TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); }
+TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); };
 TypeStore.typeNumber.prototype = Object.create(TypeBase.prototype);
 TypeStore.typeNumber.prototype.typedControlName='number';
-TypeStore.typeNumber.prototype.charRejecter=function charRejecter(char, position){
-    return !(/\d/.test(char)) && 
+TypeStore.typeNumber.prototype.rejectedChar=function rejectedChar(char, position){
+    return (
+        !(/\d/.test(char)) && 
         (char!=='.' || this.isInteger) &&
-        (char!=='-' || this.minValue>=0);
-}
+        (char!==TypeStore.locale.number.decimalSeparator || this.isInteger) &&
+        (char!=='-' || this.minValue>=0)
+    )===true;
+};
 TypeStore.typeNumber.prototype.pgSpecialParse=false;
 TypeStore.typeNumber.prototype.inexactNumber=true;
 TypeStore.typeNumber.prototype.pg_OID=701;
@@ -285,7 +288,7 @@ TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedD
 //    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', attributes:{type:'number'}});
 //}
 
-TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); }
+TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); };
 TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.double.prototype.typeDbPg='double precision';
 TypeStore.type.double.prototype.fromString=function fromString(textWithNumber){
@@ -297,10 +300,11 @@ TypeStore.type.double.prototype.fromString=function fromString(textWithNumber){
     }
 };
 
-TypeStore.type.hugeint = function TypeHugint(){ TypeStore.typeNumber.apply(this, arguments); }
+TypeStore.type.hugeint = function TypeHugint(){ TypeStore.typeNumber.apply(this, arguments); };
 TypeStore.type.hugeint.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.hugeint.prototype.maxBig= 1000000000000000;
 TypeStore.type.hugeint.prototype.minBig=-1000000000000000;
+TypeStore.type.hugeint.prototype.isInteger=true;
 TypeStore.type.hugeint.prototype.typeDbPg='numeric(1000)';
 TypeStore.type.hugeint.prototype.pgSpecialParse=true;
 // TypeStore.type.hugeint.prototype.pg_OID:1700,
@@ -308,7 +312,7 @@ TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt)
     var self = this;
     var number = Number(textWithHugeInt);
     if('maxValue' in self && number>self.maxValue || 'minValue' in self && number<self.minValue){
-        throw new TypeError("type-store: value out of range")
+        throw new TypeError("type-store: value out of range");
     }
     if(number<self.minBig || number>self.maxBig){
         number = new TypeStore.class.Big(textWithHugeInt, self.typeName);
@@ -317,7 +321,7 @@ TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt)
     return number;
 };
 
-TypeStore.type.integer=function TypeInteger(){ TypeStore.type.hugeint.apply(this,arguments); }
+TypeStore.type.integer=function TypeInteger(){ TypeStore.type.hugeint.apply(this,arguments); };
 TypeStore.type.integer.prototype=Object.create(TypeStore.type.hugeint.prototype);
 TypeStore.type.integer.prototype.maxValue= 2147483647;
 TypeStore.type.integer.prototype.minValue= -2147483648;
@@ -325,16 +329,16 @@ TypeStore.type.integer.prototype.typeDbPg='integer';
 TypeStore.type.integer.prototype.pgSpecialParse=false;
 TypeStore.type.integer.prototype.pg_OID=23;
 
-TypeStore.type.bigint=function TypeBigint(){ TypeStore.type.hugeint.apply(this,arguments); }
+TypeStore.type.bigint=function TypeBigint(){ TypeStore.type.hugeint.apply(this,arguments); };
 TypeStore.type.bigint.prototype=Object.create(TypeStore.type.hugeint.prototype);
 TypeStore.type.bigint.prototype.maxValue= 9223372036854775807;
 TypeStore.type.bigint.prototype.minValue= -9223372036854775808;
 TypeStore.type.bigint.prototype.typeDbPg='bigint';
 TypeStore.type.bigint.prototype.pg_OID=20;
 
-TypeStore.type.decimal=function TypeDecimal(){ TypeStore.typeNumber.apply(this,arguments); }
+TypeStore.type.decimal=function TypeDecimal(){ TypeStore.typeNumber.apply(this,arguments); };
 TypeStore.type.decimal.prototype=Object.create(TypeStore.typeNumber.prototype);
-TypeStore.type.decimal.prototype.maxBigLength= 10,
+TypeStore.type.decimal.prototype.maxBigLength= 10;
 TypeStore.type.decimal.prototype.typeDbPg='numeric';
 TypeStore.type.decimal.prototype.typedControlName='number';
 TypeStore.type.decimal.prototype.pgSpecialParse=true;
@@ -346,9 +350,9 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
         textWithValue = textWithValue.replace(',','.');
         number = Number(textWithValue);
     }
-    if(!typeof textWithValue=="string" 
-      || textWithValue.length>self.maxBigLength 
-      || !/\./.test(textWithValue) && number.toString()!==textWithValue
+    if(typeof textWithValue!=="string" ||
+      textWithValue.length>self.maxBigLength ||
+      !/\./.test(textWithValue) && number.toString()!==textWithValue
     ){
         number = new TypeStore.class.Big(textWithValue, self);
     }
@@ -356,7 +360,7 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
     return number;
 };
 
-TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); }
+TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); };
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
 TypeStore.type["ARRAY:text"].prototype.typeDbPg='text[]';
 TypeStore.type["ARRAY:text"].prototype.validateTypedData=function validateARRAY__Text(anyValue){
@@ -389,7 +393,7 @@ TypeStore.type["ARRAY:text"].prototype.toHtml=function toHtmlArray(typedValue){
     return html.span({class:'array'}, x);
 };
 
-TypeStore.type.jsonb = function TypeArrayJsonb(){ TypeBase.apply(this, arguments); }
+TypeStore.type.jsonb = function TypeArrayJsonb(){ TypeBase.apply(this, arguments); };
 TypeStore.type.jsonb.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.jsonb.prototype.typeDbPg='jsonb';
 TypeStore.type.jsonb.prototype.pgSpecialParse=true;
@@ -404,38 +408,39 @@ TypeStore.type.jsonb.prototype.toPlainString=function toPlainString(typedValue){
     return JSON.stringify(typedValue);
 };
 TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
+    var innerPart;
     var self=this;
     if(typedValue instanceof Array){
-        var rta=[html.span({class:'json-array-delimiter'},'[')];
+        innerPart=[html.span({class:'json-array-delimiter'},'[')];
         typedValue.forEach(function(element,i){
             if(i){
-                rta.push(html.span({class:'json-array-separator'},','));
+                innerPart.push(html.span({class:'json-array-separator'},','));
             }
-            rta.push(html.span({class:'json-array-element'},self.toHtml(element)));
+            innerPart.push(html.span({class:'json-array-element'},self.toHtml(element)));
         });
-        rta.push(html.span({class:'json-array-delimiter'},']'));
-        return html.span({class:'json-array'},rta);
+        innerPart.push(html.span({class:'json-array-delimiter'},']'));
+        return html.span({class:'json-array'},innerPart);
     }else if(typedValue instanceof Object){
-        var rta=[html.span({class:'json-object-delimiter'},'{')];
+        innerPart=[html.span({class:'json-object-delimiter'},'{')];
         var i=0;
         likeAr(typedValue).forEach(function(element,key){
             if(i++){
-                rta.push(html.span({class:'json-object-separator'},','));
+                innerPart.push(html.span({class:'json-object-separator'},','));
             }
-            rta.push(html.span({class:'json-object-key'},JSON.stringify(key)));
-            rta.push(html.span({class:'json-object-separator'},':'));
-            rta.push(html.span({class:'json-object-element'},self.toHtml(element)));
+            innerPart.push(html.span({class:'json-object-key'},JSON.stringify(key)));
+            innerPart.push(html.span({class:'json-object-separator'},':'));
+            innerPart.push(html.span({class:'json-object-element'},self.toHtml(element)));
         });
-        rta.push(html.span({class:'json-object-delimiter'},'}'));
-        return html.span({class:'json-object'},rta);
+        innerPart.push(html.span({class:'json-object-delimiter'},'}'));
+        return html.span({class:'json-object'},innerPart);
     }else if(typedValue==null){
         return html.span({class:'json-null'},'null');
     }else{
-        return html.span({class:'json-'+typeof typedValue},JSON.stringify(typedValue)||typedValue+'');
+        return html.span({class:'json-'+typeof typedValue},JSON.stringify(typedValue));
     }
 };
 
-TypeStore.type.date = function TypeArrayDate(){ TypeBase.apply(this, arguments); }
+TypeStore.type.date = function TypeArrayDate(){ TypeBase.apply(this, arguments); };
 TypeStore.type.date.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.date.prototype.typeDbPg='date';
 TypeStore.type.date.prototype.fromString=function fromString(text){
@@ -465,7 +470,7 @@ TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
-    var part={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()}
+    var part={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
     var parts=[];
     TypeStore.locale.datetime.partsOrder.forEach(function(partName, i){
         if(i){
@@ -474,7 +479,7 @@ TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPa
         parts.push(fPart(part[partName],"date-"+partName));
     });
     return fParts(parts, "date");
-}
+};
 TypeStore.type.date.prototype.fromLocalString=function toLocalString(textWithLocalValue){
     var arr=[0,0,0];
     var partsPositions={year:0, month:1, day:2};
@@ -485,7 +490,7 @@ TypeStore.type.date.prototype.fromLocalString=function toLocalString(textWithLoc
     return bestGlobals.date.array(arr);
 };
 
-TypeStore.type.interval = function TypeArrayInterval(){ TypeBase.apply(this, arguments); }
+TypeStore.type.interval = function TypeArrayInterval(){ TypeBase.apply(this, arguments); };
 TypeStore.type.interval.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.interval.prototype.typeDbPg='interval';
 TypeStore.type.interval.prototype.pgSpecialParse=true;
@@ -499,7 +504,7 @@ TypeStore.type.interval.prototype.partDefs=[
     {name:'seconds', optative:false, sufix:''  , twoDigits:true },
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.interval.prototype.regExp=/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i,
+TypeStore.type.interval.prototype.regExp=/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
     var self = this;
     typeInfo = typeInfo || this;
@@ -511,7 +516,9 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
     }
     var matches=stringWithInterval.match(self.regExp);
     /* istanbul ignore next */
-    if(!matches) return null;
+    if(!matches){
+        return null;
+    }
     var interval={};
     self.partDefs.forEach(function(partDef, i){
         if(matches[i+1]){
@@ -538,7 +545,7 @@ TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValu
     */
 };
 
-TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); }
+TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.timestamp.prototype.typeDbPg='timestamp';
 TypeStore.type.timestamp.prototype.pgSpecialParse=true;
@@ -619,13 +626,13 @@ TypeStore.completeTypeInfo = function(typeInfo){
             }
         });
     }
-}
+};
 
 TypeStore.TypeBase = TypeBase;
 
 TypeStore.typerFrom = function typerFrom(typeInfo){
     return new TypeStore.type[typeInfo.typeName](typeInfo);
-}
+};
 
 return TypeStore;
 

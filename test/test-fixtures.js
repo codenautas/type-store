@@ -159,6 +159,9 @@ describe("fixtures", function(){
                 }
                 if(obtained!==null){
                     var localObtained=typer.toLocalString(obtained);
+                    localObtained.split('').forEach(function(char,position){
+                        discrepances.showAndThrow(typer.rejectedChar(char,position),false,{showContext:'NOT rejecting '+JSON.stringify(char)+' in position '+position});
+                    });
                     discrepances.showAndThrow(localObtained, localText, {showContext:json4all.stringify(obtained)});
                     discrepances.showAndThrow(typer.isValidLocalString(localObtained),true,{showContext:'local:'+localObtained});
                     if(!skipFromLocal){
@@ -189,6 +192,13 @@ describe("fixtures", function(){
         (typeDef.invalidLocales||[]).forEach(function(invalidLocal){
             it("reject local \""+invalidLocal+"\"", function(){
                 discrepances.showAndThrow(typer.isValidLocalString(invalidLocal),false);
+            });
+        });
+        (typeDef.rejectChars||[]).forEach(function(rejectChar){
+            it("reject local \""+rejectChar+"\"", function(){
+                var char=typeof rejectChar==='string'?rejectChar:rejectChar.char;
+                var position=typeof rejectChar==='string'?1:rejectChar.position;
+                discrepances.showAndThrow(typer.rejectedChar(char,1),true);
             });
         });
       });
