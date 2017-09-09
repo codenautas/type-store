@@ -94,6 +94,9 @@ function TypeBase(typeInfo){
     this.typeInfo=typeInfo||{};
     this.typeInfo.typeName=this.typeInfo.typeName||this.typeName;
 };
+TypeBase.prototype.charRejecter = function charRejecter(char, position){
+    return false;
+}
 TypeBase.prototype.setTypeInfo = function setTypeInfo(value){
     if(value instanceof Object){
         //value.typeInfo=this;
@@ -241,6 +244,11 @@ TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(ty
 TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); }
 TypeStore.typeNumber.prototype = Object.create(TypeBase.prototype);
 TypeStore.typeNumber.prototype.typedControlName='number';
+TypeStore.typeNumber.prototype.charRejecter=function charRejecter(char, position){
+    return !(/\d/.test(char)) && 
+        (char!=='.' || this.isInteger) &&
+        (char!=='-' || this.minValue>=0);
+}
 TypeStore.typeNumber.prototype.pgSpecialParse=false;
 TypeStore.typeNumber.prototype.inexactNumber=true;
 TypeStore.typeNumber.prototype.pg_OID=701;
@@ -420,6 +428,8 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
         });
         rta.push(html.span({class:'json-object-delimiter'},'}'));
         return html.span({class:'json-object'},rta);
+    }else if(typedValue==null){
+        return html.span({class:'json-null'},'null');
     }else{
         return html.span({class:'json-'+typeof typedValue},JSON.stringify(typedValue)||typedValue+'');
     }

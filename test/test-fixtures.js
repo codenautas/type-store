@@ -26,16 +26,16 @@ describe("fixtures", function(){
       {typeName:'boolean', fixtures:[
           {fromString:'s', value:true , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
           {fromString:'f', value:false, toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
-          {fromString:null, value:null, toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
+          {                value:null , toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
       ]},
       {typeName:'text', fixtures:[
           {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
-          {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
+          {                    value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
       ], invalidValues:[1, new Date(), /x/, {value:'', expectedError:/text cannot be empty/i}]},
       {typeName:'text', fixtures:[
           {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
-          {fromString:'', value:'', toPlainString:'', toHtmlText:"<span class=text><span class='text-empty'></span></span>"},
-          {fromString:null, value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
+          {fromString:''     , value:'', toPlainString:'', toHtmlText:"<span class=text><span class='text-empty'></span></span>"},
+          {                    value:null, toHtmlText:"<span class=text><span class='text-null'></span></span>"},
       ], typeInfo:{typeName:'text', allowEmptyText:true}},
       {typeName:'hugeint', fixtures:[
       ]},
@@ -44,12 +44,13 @@ describe("fixtures", function(){
           {fromString:'2147483648',
            fromStringError:new TypeError ('type-store: value out of range')
           }
-      ]},
+      ], rejectChars:['.','x',' ']},
       {typeName:'decimal', fixtures:[
           {fromString:'2147483646', value:2147483646, toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'></span><span class='number-miles'>147</span><span class='number-separator'></span><span class='number-miles'>483</span><span class='number-separator'></span><span class='number-miles'>646</span></span>"},
-          {fromString:'2,3', value:2.3, toPlainString:'2.3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
+          {fromString:'2,3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
           {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2147483648,010000000001'}
-      ], invalidValues:['x', new Date()]},
+      ], invalidValues:['x', new Date()]
+      , rejectChars:['x',' ']},
       {typeName:'double', fixtures:[
           {fromString:'2.3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
       ], invalidValues:['9.3']},
@@ -58,9 +59,10 @@ describe("fixtures", function(){
           {fromString:'a;b', toHtmlText:"<span class=array><span class='array-element'>a</span><span class='array-separator'>;</span><span class='array-element'>b</span></span>"},
       ], invalidValues:[7 , [7]]},
       {typeName:'jsonb', fixtures:[
-          {fromString:'{"a": "b"}', toPlainString:'{"a":"b"}', value:{a:'b'}},
-          {value:[undefined, null, 'hi', {a:7, b:false}], 
-           toHtmlText:"<span class='json-array'><span class='json-array-delimiter'>[</span><span class='json-array-element'><span class='json-undefined'>undefined</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-string'>&quot;hi&quot;</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'><span class='json-object-delimiter'>{</span><span class='json-object-key'>&quot;a&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-number'>7</span></span><span class='json-object-separator'>,</span><span class='json-object-key'>&quot;b&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-boolean'>false</span></span><span class='json-object-delimiter'>}</span></span></span><span class='json-array-delimiter'>]</span></span>"
+          {fromString:'{"a": "b"}', toPlainString:'{"a":"b"}', value:{a:'b'}, local:'{"a":"b"}'},
+          {value:[null, null, 'hi', {a:7, b:false}], 
+           toHtmlText:"<span class='json-array'><span class='json-array-delimiter'>[</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-string'>&quot;hi&quot;</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'><span class='json-object-delimiter'>{</span><span class='json-object-key'>&quot;a&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-number'>7</span></span><span class='json-object-separator'>,</span><span class='json-object-key'>&quot;b&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-boolean'>false</span></span><span class='json-object-delimiter'>}</span></span></span><span class='json-array-delimiter'>]</span></span>",
+           local:"[null,null,\"hi\",{\"a\":7,\"b\":false}]"
           },
       ]},
       {typeName:'interval', fixtures:[
@@ -140,21 +142,29 @@ describe("fixtures", function(){
                     discrepances.showAndThrow(obtainedOutput, fixture.toPlainString);
                 }
                 if('toHtmlText' in fixture){
-                    var obtainedOutput=typer.toHtmlText(obtained);
-                    discrepances.showAndThrow(obtainedOutput, fixture.toHtmlText);
+                    var obtainedHtml=typer.toHtmlText(obtained);
+                    discrepances.showAndThrow(obtainedHtml, fixture.toHtmlText);
                 }
                 if('local' in fixture){
+                    var localText = fixture.local;
+                }else if('toPlainString' in fixture){
+                    var localText = fixture.toPlainString;
+                }else if('fromString' in fixture){
+                    var localText = fixture.fromString;
+                }else if(obtainedOutput!==undefined){
+                    var localText = fixture.fromString;
+                }else{
+                    var skipFromLocal=true;
+                    var localText = '';
+                }
+                if(obtained!==null){
                     var localObtained=typer.toLocalString(obtained);
-                    discrepances.showAndThrow(localObtained, fixture.local);
+                    discrepances.showAndThrow(localObtained, localText, {showContext:json4all.stringify(obtained)});
                     discrepances.showAndThrow(typer.isValidLocalString(localObtained),true,{showContext:'local:'+localObtained});
-                }
-                if('local' in fixture){
-                    var localObtained=typer.fromLocalString(fixture.local);
-                    discrepances.showAndThrow(localObtained, obtained);
-                }
-                if('fromLocal' in fixture){
-                    var localObtained=typer.fromLocalString(fixture.fromLocal);
-                    discrepances.showAndThrow(localObtained, obtained);
+                    if(!skipFromLocal){
+                        var localObtained=typer.fromLocalString(localText);
+                        discrepances.showAndThrow(localObtained, obtained);
+                    }
                 }
               }
             });
