@@ -20,6 +20,7 @@ describe("bigint", function(){
         var n = typeBigint.fromString(txt);
         assert.equal(typeof n, "object");
         assert(n instanceof Big);
+        assert.equal(n.toPostgres(), txt);
         // assert(n.typeInfo);
         // assert.equal(n.typeInfo.typeName, "bigint");
         assert.equal(n.toLiteral(), txt);

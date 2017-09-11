@@ -59,6 +59,10 @@ Big.prototype.sameValue=function(other){
     return other instanceof Big && this.toString() == other.toString();
 };
 
+Big.prototype.toPostgres = function toPostgres(){
+    return this.toString();
+}
+
 TypeStore.locale={
     number:{
         decimalSeparator:'.',
