@@ -42,6 +42,14 @@ TypeStore.messages={
         false:'no',
         null:''
     },
+    number:{
+        decimalSeparator:'.',
+        milesSeparator:''
+    },
+    datetime:{
+        dateSeparator:'-',
+        partsOrder:['month','day','year'],
+    }
 };
 
 TypeStore.messages.es={
@@ -50,6 +58,14 @@ TypeStore.messages.es={
         false:'no',
         null:''
     },
+    number:{
+        decimalSeparator:',',
+        milesSeparator:''
+    },
+    datetime:{
+        dateSeparator:'/',
+        partsOrder:['day','month','year'],
+    }
 };
 
 Big.prototype.sameValue=function(other){
@@ -62,28 +78,6 @@ Big.prototype.sameValue=function(other){
 Big.prototype.toPostgres = function toPostgres(){
     return this.toString();
 }
-
-TypeStore.locale={
-    number:{
-        decimalSeparator:'.',
-        milesSeparator:''
-    },
-    datetime:{
-        dateSeparator:'-',
-        partsOrder:['month','day','year'],
-    }
-};
-
-TypeStore.locale.es={
-    number:{
-        decimalSeparator:',',
-        milesSeparator:''
-    },
-    datetime:{
-        dateSeparator:'/',
-        partsOrder:['day','month','year'],
-    }
-};
         
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
@@ -252,7 +246,7 @@ TypeStore.typeNumber.prototype.rejectedChar=function rejectedChar(char, position
     return (
         !(/\d/.test(char)) && 
         (char!=='.' || this.isInteger) &&
-        (char!==TypeStore.locale.number.decimalSeparator || this.isInteger) &&
+        (char!==TypeStore.messages.number.decimalSeparator || this.isInteger) &&
         (char!=='-' || this.minValue>=0)
     )===true;
 };
@@ -272,12 +266,12 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
             }
             rta.push(fPart(prefix,"number-miles"));
             triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
-                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator"));
+                rta.push(fPart(TypeStore.messages.number.milesSeparator,"number-separator"));
                 rta.push(fPart(triplet,"number-miles"));
             });
         });
         if(dot){
-            rta.push(fPart(TypeStore.locale.number.decimalSeparator,"number-dot"));
+            rta.push(fPart(TypeStore.messages.number.decimalSeparator,"number-dot"));
         }
         if(decimals){
             rta.push(fPart(decimals,"number-decimals"));
@@ -476,9 +470,9 @@ TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
     var part={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
     var parts=[];
-    TypeStore.locale.datetime.partsOrder.forEach(function(partName, i){
+    TypeStore.messages.datetime.partsOrder.forEach(function(partName, i){
         if(i){
-            parts.push(fPart(TypeStore.locale.datetime.dateSeparator,"date-sep"));
+            parts.push(fPart(TypeStore.messages.datetime.dateSeparator,"date-sep"));
         }
         parts.push(fPart(part[partName],"date-"+partName));
     });
@@ -489,7 +483,7 @@ TypeStore.type.date.prototype.fromLocalString=function toLocalString(textWithLoc
     var partsPositions={year:0, month:1, day:2};
     var i=0;
     textWithLocalValue.replace(/\d+/g, function(number){
-        arr[partsPositions[TypeStore.locale.datetime.partsOrder[i++]]]=Number(number);
+        arr[partsPositions[TypeStore.messages.datetime.partsOrder[i++]]]=Number(number);
     });
     return bestGlobals.date.array(arr);
 };
