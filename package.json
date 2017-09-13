@@ -1,7 +1,7 @@
 {
   "name": "type-store",
   "description": "type ecosystem",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "repository": "codenautas/type-store",
   "license": "MIT",
@@ -12,7 +12,7 @@
 
     "best-globals": "~0.10.1",
     "js-to-html": "~0.9.3",
-    "json4all": "~0.3.9",
+    "json4all": "~0.3.10",
     "like-ar": "~0.2.2"
   },
   "devDependencies": {
