@@ -44,7 +44,8 @@ TypeStore.messages={
     },
 };
 
-TypeStore.messages.es={
+TypeStore.i18n={messages:{}, locale:{}};
+TypeStore.i18n.messages.es={
     boolean:{
         true:'sí',
         false:'no',
@@ -61,10 +62,12 @@ Big.prototype.sameValue=function(other){
 
 Big.prototype.toPostgres = function toPostgres(){
     return this.toString();
-}
+};
 
 TypeStore.locale={
+    align:'left',
     number:{
+        align:'right',
         decimalSeparator:'.',
         milesSeparator:''
     },
@@ -74,7 +77,7 @@ TypeStore.locale={
     }
 };
 
-TypeStore.locale.es={
+TypeStore.i18n.locale.es=changing(TypeStore.locale,{
     number:{
         decimalSeparator:',',
         milesSeparator:''
@@ -83,8 +86,8 @@ TypeStore.locale.es={
         dateSeparator:'/',
         partsOrder:['day','month','year'],
     }
-};
-        
+});
+
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
     //this.typeInfo = typeInfo;
@@ -185,6 +188,9 @@ TypeBase.prototype.getDomFixtures=function getDomFixtures(){
         {tagName:'input', attributes:{type:'text'}}
     ];
 };
+Object.defineProperty(TypeBase.prototype, 'align', {
+    get: function(){ return TypeStore.locale.align; }
+});
 
 TypeStore.type.boolean = function TypeBoolean(){ TypeBase.apply(this, arguments); };
 TypeStore.type.boolean.prototype = Object.create(TypeBase.prototype);
@@ -291,6 +297,9 @@ TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedD
 //TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
 //    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', attributes:{type:'number'}});
 //}
+Object.defineProperty(TypeStore.typeNumber.prototype, 'align', {
+    get: function(){ return TypeStore.locale.number.align; }
+});
 
 TypeStore.type.double = function TypeDouble(){ TypeStore.typeNumber.apply(this, arguments); };
 TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);

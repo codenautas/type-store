@@ -39,4 +39,14 @@ describe("bigint", function(){
         discrepances.showAndThrow(htmlText,"<span class=number><span class='number-miles'>12</span><span class='number-separator'> . </span><span class='number-miles'>345</span><span class='number-dot'> , </span><span class='number-decimals'>67</span></span>");
         TypeStore.locale = changing({},saveOptions);
     });
+    it("have right align", function(){
+        discrepances.showAndThrow(typeBigint.align, 'right');
+    });
+});
+
+describe("text", function(){
+    var typer = new TypeStore.type.text();
+    it("have right align", function(){
+        discrepances.showAndThrow(typer.align, 'left');
+    });
 });

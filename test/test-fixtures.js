@@ -18,8 +18,8 @@ function ignoreTypeInfoAndThrow(obtained, expected){
     discrepances.showAndThrow(obtained, expected);
 }
 
-TypeStore.messages = TypeStore.messages.es;
-TypeStore.locale = TypeStore.locale.es;
+TypeStore.messages = TypeStore.i18n.messages.es;
+TypeStore.locale = TypeStore.i18n.locale.es;
 
 describe("fixtures", function(){
   [
