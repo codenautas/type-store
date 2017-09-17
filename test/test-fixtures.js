@@ -20,10 +20,10 @@ function ignoreTypeInfoAndThrow(obtained, expected){
 }
 
 describe("fixtures", function(){
-    before(function(){
+  before(function(){
         TypeStore.messages = changing({},TypeStore.i18n.messages.es);
         TypeStore.locale   = changing({},TypeStore.i18n.locale.es  );
-    });
+  });
   [
       {typeName:'boolean', fixtures:[
           {fromString:'s', value:true , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
@@ -75,9 +75,9 @@ describe("fixtures", function(){
           {fromString:'1D 10h'  , toPlainString:'1D 10:00:00', construct:{days:1, hours:10}},
           {fromString:'4'       , fromStringError:new TypeError('NOT timeInterval')},
       ], constructorFunction:bestGlobals.timeInterval},
-      {typeName:'interval', describeFixtures:'with unit', timeUnit:'hours', fixtures:[
-          {fromString:'5'       , toPlainString:'5:00:00'},
-      ]},
+      {typeName:'interval', describeFixtures:'with unit', fixtures:[
+          {fromString:'6'       , toPlainString:'6:00:00'},
+      ], typeInfo:{typeName:'interval', timeUnit:'hours'}},
       {typeName:'date', fixtures:[
           {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
           /* {fromString:'2017-12-23', toPlainString:'2017-12-23', value:new Date(2017,11,23,0,0,0), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},*/
@@ -93,9 +93,6 @@ describe("fixtures", function(){
     if(!typeDef.skip){
       describe(typeDef.typeName+' '+(typeDef.describeFixtures||''), function(){
         var typer = TypeStore.typerFrom(typeDef.typeInfo||{typeName:typeDef.typeName});
-        likeAr(typeDef).forEach(function(value, attr){
-            typer[attr]=value;
-        });
         typeDef.fixtures.forEach(function(fixture){
           if(!fixture.skip){
             it("accept \""+fixture.fromString+"\"", function(){

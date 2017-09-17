@@ -542,7 +542,7 @@ TypeStore.type.interval.prototype.partDefs=[
 TypeStore.type.interval.prototype.regExp=/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
     var self = this;
-    typeInfo = typeInfo || this;
+    typeInfo = typeInfo || this.typeInfo;
     if(!isNaN(stringWithInterval)){
         if(!typeInfo.timeUnit){
             throw new TypeError('NOT timeInterval');
