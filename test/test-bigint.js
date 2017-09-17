@@ -61,7 +61,11 @@ describe("bigint", function(){
             "<span class='number-dot'>.</span>"+
             "<span class='number-decimals'>67</span></span>"
         );
+        discrepances.showAndThrow(typeDecimal.toLocalString(value),'12,345.67');
         TypeStore.options.doNotCopyNonCopyables=false;
+        TypeStore.options.doNotOutputNonCopyables=true;
+        discrepances.showAndThrow(typeDecimal.toLocalString(value),'12345.67');
+        TypeStore.options.doNotOutputNonCopyables=false;
     });
     it("have right align", function(){
         discrepances.showAndThrow(typeBigint.align, 'right');

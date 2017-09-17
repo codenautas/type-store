@@ -176,7 +176,12 @@ TypeBase.prototype.toLocalString=function toLocalString(typedValue){
     if(this.toLocalParts){
         return this.toLocalParts(
             typedValue,
-            function Part(part){return part;},
+            function Part(part, className, skippable){
+                if(skippable && TypeStore.options.doNotOutputNonCopyables){
+                    return '';
+                }
+                return part;
+            },
             function Parts(parts){return parts.join('');}
         );
     }else{
