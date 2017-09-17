@@ -80,7 +80,7 @@ TypeStore.i18n.locale.es=changing(TypeStore.i18n.locale.en,{
     }
 });
 
-var currentLang = global.currentLang;
+var currentLang = 'en';
 
 TypeStore.messages = TypeStore.i18n.messages[currentLang];
 TypeStore.locale   = TypeStore.i18n.locale  [currentLang];
