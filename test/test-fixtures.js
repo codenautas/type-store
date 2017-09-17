@@ -1,6 +1,7 @@
 "use strict";
 
 var bestGlobals = require('best-globals');
+var changing = bestGlobals.changing;
 var discrepances = require('discrepances');
 var assert = require('assert');
 var likeAr = require('like-ar');
@@ -18,10 +19,11 @@ function ignoreTypeInfoAndThrow(obtained, expected){
     discrepances.showAndThrow(obtained, expected);
 }
 
-TypeStore.messages = TypeStore.i18n.messages.es;
-TypeStore.locale = TypeStore.i18n.locale.es;
-
 describe("fixtures", function(){
+    before(function(){
+        TypeStore.messages = changing({},TypeStore.i18n.messages.es);
+        TypeStore.locale   = changing({},TypeStore.i18n.locale.es  );
+    });
   [
       {typeName:'boolean', fixtures:[
           {fromString:'s', value:true , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
@@ -46,9 +48,9 @@ describe("fixtures", function(){
           }
       ], rejectChars:['.','x',' ']},
       {typeName:'decimal', fixtures:[
-          {fromString:'2147483646', value:2147483646, toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'></span><span class='number-miles'>147</span><span class='number-separator'></span><span class='number-miles'>483</span><span class='number-separator'></span><span class='number-miles'>646</span></span>"},
+          {fromString:'2147483646', value:2147483646, local:'2.147.483.646', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'>.</span><span class='number-miles'>147</span><span class='number-separator'>.</span><span class='number-miles'>483</span><span class='number-separator'>.</span><span class='number-miles'>646</span></span>"},
           {fromString:'2,3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
-          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2147483648,010000000001'}
+          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2.147.483.648,010000000001'}
       ], invalidValues:['x', new Date()]
       , rejectChars:['x',' ']},
       {typeName:'double', fixtures:[

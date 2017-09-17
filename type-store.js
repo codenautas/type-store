@@ -36,7 +36,11 @@ TypeStore.type={};
 
 TypeStore.class={};
 
-TypeStore.messages={
+TypeStore.options={};
+
+TypeStore.i18n={messages:{}, locale:{}};
+
+TypeStore.i18n.messages.en={
     boolean:{
         true:'yes',
         false:'no',
@@ -44,7 +48,6 @@ TypeStore.messages={
     },
 };
 
-TypeStore.i18n={messages:{}, locale:{}};
 TypeStore.i18n.messages.es={
     boolean:{
         true:'sí',
@@ -52,6 +55,35 @@ TypeStore.i18n.messages.es={
         null:''
     },
 };
+
+TypeStore.i18n.locale.en={
+    align:'left',
+    number:{
+        align:'right',
+        decimalSeparator:'.',
+        milesSeparator:','
+    },
+    datetime:{
+        dateSeparator:'-',
+        partsOrder:['month','day','year'],
+    }
+};
+
+TypeStore.i18n.locale.es=changing(TypeStore.i18n.locale.en,{
+    number:{
+        decimalSeparator:',',
+        milesSeparator:'.'
+    },
+    datetime:{
+        dateSeparator:'/',
+        partsOrder:['day','month','year'],
+    }
+});
+
+var currentLang = global.currentLang;
+
+TypeStore.messages = TypeStore.i18n.messages[currentLang];
+TypeStore.locale   = TypeStore.i18n.locale  [currentLang];
 
 Big.prototype.sameValue=function(other){
     if(typeof other === 'number'){
@@ -63,30 +95,6 @@ Big.prototype.sameValue=function(other){
 Big.prototype.toPostgres = function toPostgres(){
     return this.toString();
 };
-
-TypeStore.locale={
-    align:'left',
-    number:{
-        align:'right',
-        decimalSeparator:'.',
-        milesSeparator:''
-    },
-    datetime:{
-        dateSeparator:'-',
-        partsOrder:['month','day','year'],
-    }
-};
-
-TypeStore.i18n.locale.es=changing(TypeStore.locale,{
-    number:{
-        decimalSeparator:',',
-        milesSeparator:''
-    },
-    datetime:{
-        dateSeparator:'/',
-        partsOrder:['day','month','year'],
-    }
-});
 
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
@@ -113,11 +121,17 @@ TypeBase.prototype.toHtmlText = function toHtmlText(value){
     return this.toHtml(value).toHtmlText();
 };
 TypeBase.prototype.toHtml=function toHtml(typedValue){
+    var typer=this;
     if(this.toLocalParts){
         return this.toLocalParts(
             typedValue,
-            function Part(part, className){
-                return html.span({class:className}, part);
+            function Part(part, className, skippable){
+                var attr={class:className};
+                if(skippable && TypeStore.options.doNotCopyNonCopyables){
+                    attr["non-copyable"]=part;
+                    part='';
+                }
+                return html.span(attr, part);
             },
             function Parts(parts, className){
                 return html.span({class:className}, parts);
@@ -278,7 +292,7 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
             }
             rta.push(fPart(prefix,"number-miles"));
             triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
-                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator"));
+                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator",true));
                 rta.push(fPart(triplet,"number-miles"));
             });
         });
@@ -293,6 +307,9 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
 };
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
+};
+TypeStore.typeNumber.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
+    return this.fromString(textWithLocalValue.replace(new RegExp("\\"+TypeStore.locale.number.milesSeparator.split('').join('\\'),'g'),''));
 };
 //TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
 //    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', attributes:{type:'number'}});
@@ -493,7 +510,7 @@ TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPa
     });
     return fParts(parts, "date");
 };
-TypeStore.type.date.prototype.fromLocalString=function toLocalString(textWithLocalValue){
+TypeStore.type.date.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     var arr=[0,0,0];
     var partsPositions={year:0, month:1, day:2};
     var i=0;

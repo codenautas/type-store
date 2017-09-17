@@ -9,6 +9,11 @@ var Big = require('big.js');
 
 describe("bigint", function(){
     var typeBigint = new TypeStore.type.bigint();
+    beforeEach(function(){
+        if(TypeStore.i18n.locale.en){
+            TypeStore.locale = changing({},TypeStore.i18n.locale.en);
+        }
+    });
     it("not convert little and medium integers", function(){
         var txt="123456789012345";
         var n = typeBigint.fromString(txt);
@@ -31,13 +36,32 @@ describe("bigint", function(){
     it("html in spanish", function(){
         var txt="12345.67";
         var typeDecimal = new TypeStore.type.decimal();
-        var saveOptions = changing({},TypeStore.locale);
         TypeStore.locale.number.decimalSeparator=' , ';
         TypeStore.locale.number.milesSeparator=' . ';
         var value = typeDecimal.fromString(txt);
         var htmlText = typeDecimal.toHtmlText(value);
-        discrepances.showAndThrow(htmlText,"<span class=number><span class='number-miles'>12</span><span class='number-separator'> . </span><span class='number-miles'>345</span><span class='number-dot'> , </span><span class='number-decimals'>67</span></span>");
-        TypeStore.locale = changing({},saveOptions);
+        discrepances.showAndThrow(htmlText,
+            "<span class=number><span class='number-miles'>12</span>"+
+            "<span class='number-separator'> . </span>"+
+            "<span class='number-miles'>345</span>"+
+            "<span class='number-dot'> , </span>"+
+            "<span class='number-decimals'>67</span></span>"
+        );
+    });
+    it("html non pasteable separator", function(){
+        var txt="12345.67";
+        var typeDecimal = new TypeStore.type.decimal();
+        TypeStore.options.doNotCopyNonCopyables=true;
+        var value = typeDecimal.fromString(txt);
+        var htmlText = typeDecimal.toHtmlText(value);
+        discrepances.showAndThrow(htmlText,
+            "<span class=number><span class='number-miles'>12</span>"+
+            "<span class='number-separator' non-copyable=','></span>"+
+            "<span class='number-miles'>345</span>"+
+            "<span class='number-dot'>.</span>"+
+            "<span class='number-decimals'>67</span></span>"
+        );
+        TypeStore.options.doNotCopyNonCopyables=false;
     });
     it("have right align", function(){
         discrepances.showAndThrow(typeBigint.align, 'right');
