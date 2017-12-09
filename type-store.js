@@ -584,7 +584,7 @@ TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, argume
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.timestamp.prototype.typeDbPg='timestamp';
 TypeStore.type.timestamp.prototype.pgSpecialParse=true;
-TypeStore.type.timestamp.prototype.pg_OID=1114;
+TypeStore.type.timestamp.prototype.pg_OIDS=[1114,1184];
 // constructorFunction:new PostgresInterval().constructor,
 TypeStore.type.timestamp.prototype.fromString=function fromString(text){
     return bestGlobals.datetime.iso(text);
