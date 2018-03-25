@@ -19,6 +19,8 @@ function ignoreTypeInfoAndThrow(obtained, expected){
     discrepances.showAndThrow(obtained, expected);
 }
 
+var currYear=new Date().getFullYear();
+
 describe("fixtures", function(){
   before(function(){
         TypeStore.messages = changing({},TypeStore.i18n.messages.es);
@@ -80,6 +82,7 @@ describe("fixtures", function(){
       ], typeInfo:{typeName:'interval', timeUnit:'hours'}},
       {typeName:'date', fixtures:[
           {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
+          {fromString:currYear+'-12-23', toPlainString:currYear+'-12-23', value:bestGlobals.date.iso(currYear+'-12-23'), local:'23/12/'+currYear, fromLocal:'23/12', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>"+currYear+"</span></span>"},
           /* {fromString:'2017-12-23', toPlainString:'2017-12-23', value:new Date(2017,11,23,0,0,0), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},*/
           {fromString:'4'       , fromStringError:new Error('invalid date')},
       ], constructorFunction:bestGlobals.date.iso
@@ -166,6 +169,11 @@ describe("fixtures", function(){
                     if(!skipFromLocal){
                         var localObtained=typer.fromLocalString(localText);
                         discrepances.showAndThrow(localObtained, obtained);
+                        if(fixture.fromLocal){
+                            discrepances.showAndThrow(typer.isValidLocalString(fixture.fromLocal),true,{showContext:'local:'+fixture.fromLocal});
+                            var localObtained=typer.fromLocalString(fixture.fromLocal);
+                            discrepances.showAndThrow(localObtained, obtained);
+                        }
                     }
                 }
               }

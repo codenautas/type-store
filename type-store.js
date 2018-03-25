@@ -188,7 +188,7 @@ TypeBase.prototype.toLocalString=function toLocalString(typedValue){
         return this.toPlainString(typedValue);
     }
 };
-TypeBase.prototype.fromLocalString=function toLocalString(textWithLocalValue){
+TypeBase.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue);
 };
 TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalValue){
@@ -490,14 +490,6 @@ TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInval
     }
     if(!object.isRealDate){
         return 'Not a real date in input';
-        /*
-        try{
-            bestGlobals.date(object);
-            return null;
-        }catch(err){
-            return err.message;
-        }
-        */
     }
     return null;
 };
@@ -516,7 +508,7 @@ TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPa
     return fParts(parts, "date");
 };
 TypeStore.type.date.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
-    var arr=[0,0,0];
+    var arr=[new Date().getFullYear(),0,0];
     var partsPositions={year:0, month:1, day:2};
     var i=0;
     textWithLocalValue.replace(/\d+/g, function(number){
