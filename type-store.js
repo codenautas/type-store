@@ -497,13 +497,20 @@ TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
-    var part={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
+    var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
     var parts=[];
     TypeStore.locale.datetime.partsOrder.forEach(function(partName, i){
         if(i){
             parts.push(fPart(TypeStore.locale.datetime.dateSeparator,"date-sep"));
         }
-        parts.push(fPart(part[partName],"date-"+partName));
+        var part=partData[partName];
+        if(partName==='year'){
+            part=part.toString();
+            part=fParts([fPart(part.substr(0,part.length-2),"date-century"),part.substr(part.length-2)],"date-year");
+        }else{
+            part=fPart(part,"date-"+partName)
+        }
+        parts.push(part);
     });
     return fParts(parts, "date");
 };

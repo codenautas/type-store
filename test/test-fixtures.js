@@ -19,7 +19,7 @@ function ignoreTypeInfoAndThrow(obtained, expected){
     discrepances.showAndThrow(obtained, expected);
 }
 
-var currYear=new Date().getFullYear();
+var currYear=new Date().getFullYear().toString();
 
 describe("fixtures", function(){
   before(function(){
@@ -81,9 +81,8 @@ describe("fixtures", function(){
           {fromString:'6'       , toPlainString:'6:00:00'},
       ], typeInfo:{typeName:'interval', timeUnit:'hours'}},
       {typeName:'date', fixtures:[
-          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},
-          {fromString:currYear+'-12-23', toPlainString:currYear+'-12-23', value:bestGlobals.date.iso(currYear+'-12-23'), local:'23/12/'+currYear, fromLocal:'23/12', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>"+currYear+"</span></span>"},
-          /* {fromString:'2017-12-23', toPlainString:'2017-12-23', value:new Date(2017,11,23,0,0,0), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'>2017</span></span>"},*/
+          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>20</span>17</span></span>"},
+          {fromString:currYear+'-12-23', toPlainString:currYear+'-12-23', value:bestGlobals.date.iso(currYear+'-12-23'), local:'23/12/'+currYear, fromLocal:'23/12', toHtmlText:"<span class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>"+currYear.substr(0,2)+"</span>"+currYear.substr(2,2)+"</span></span>"},
           {fromString:'4'       , fromStringError:new Error('invalid date')},
       ], constructorFunction:bestGlobals.date.iso
       , invalidValues:[7 , [7], '2017-12-12 10:30:45', new Date(),'2017-12-23',"2017-09-02T15:08:16.318Z"]
