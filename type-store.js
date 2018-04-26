@@ -397,7 +397,9 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
     self.setTypeInfo(number);
     return number;
 };
-
+TypeStore.type.decimal.prototype.fromExcelCell=function fromExcelCell(cell){
+    return cell.v?(cell.t === 'n')?this.fromString(cell.v):cell.v.replace(/,/g, '.'):null;
+};
 TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); };
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
 TypeStore.type["ARRAY:text"].prototype.typeDbPg='text[]';
