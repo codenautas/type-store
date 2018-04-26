@@ -316,6 +316,9 @@ TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedD
 TypeStore.typeNumber.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue.replace(new RegExp("\\"+TypeStore.locale.number.milesSeparator.split('').join('\\'),'g'),''));
 };
+TypeStore.typeNumber.prototype.toExcelType=function toExcelType(typedValue){
+    return 'n';
+};
 //TypeStore.typeNumber.prototype.getDomFixtures = function getDomFixtures(){
 //    return TypeBase.prototype.getDomFixtures.call(this).concat({tagName:'input', attributes:{type:'number'}});
 //}
