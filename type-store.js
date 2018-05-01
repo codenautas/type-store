@@ -244,6 +244,19 @@ TypeStore.type.text.prototype.toPlainString=function toPlainString(typedValue){
 TypeStore.type.text.prototype.fromString=function fromString(textWithValue){
     return textWithValue;
 };
+TypeStore.type.text.prototype.fromLocalString=function fromLocalString(textWithValue){
+    if(this.typeInfo.toUpperWithoutDiacritics){
+        return textWithValue.toUpperCase()
+            .replace(/[áÁàÀ]/g,'A')
+            .replace(/[éÉèÈ]/g,'E')
+            .replace(/[íÍìÌ]/g,'I')
+            .replace(/[óÓòÒ]/g,'O')
+            .replace(/[úÚùÙüÜ]/g,'U')
+            .replace(/[ñ]/g,'Ñ')
+            .replace(/[^A-Z0-9_]/g,'_')
+    }
+    return textWithValue;
+};
 TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     var answer=typedValue;
     if(typedValue===''){
@@ -254,6 +267,10 @@ TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     }
     return html.span({"class": "text"}, answer);
 };
+TypeStore.type.text.prototype.rejectedChar = function rejectedChar(char, position){
+    return this.typeInfo.acceptedChars && this.typeInfo.acceptedChars.test(char);
+};
+
 /*
 TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedData){
     return 
