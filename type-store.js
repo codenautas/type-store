@@ -503,6 +503,9 @@ TypeStore.type.date.prototype.typeDbPg='date';
 TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
+TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
+    return cell.v?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
+};
 TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(object){
     if(object==null){
         return null;
@@ -517,6 +520,12 @@ TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInval
 };
 TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
+};
+TypeStore.type.date.prototype.toExcelValue=function toExcelValue(typedValue){
+    return typedValue.toYmd();
+};
+TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
+    return 'd';
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
