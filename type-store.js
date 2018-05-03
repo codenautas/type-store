@@ -609,6 +609,15 @@ TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValu
     return t;
     */
 };
+TypeStore.type.interval.prototype.toExcelValue=function toExcelValue(typedValue){
+    return typedValue.timeInterval.ms?typedValue.timeInterval.ms/(1000*60*60*24):null;
+};
+TypeStore.type.interval.prototype.toExcelType=function toExcelType(typedValue){
+    return 'n';
+};
+TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
+    return this.fromString(cell.v);
+};
 
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
