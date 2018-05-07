@@ -616,7 +616,7 @@ TypeStore.type.interval.prototype.toExcelType=function toExcelType(typedValue){
     return 'n';
 };
 TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
-    return this.fromString(cell.v);
+    return cell.v?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
 };
 
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
