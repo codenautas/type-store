@@ -154,6 +154,9 @@ TypeBase.prototype.toExcelType=function toExcelType(typedValue){
 TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
     return this.fromString(cell.w);
 };
+TypeBase.prototype.toJson=function toJson(typedValue){
+    return typedValue;
+};
 TypeBase.prototype.typedControlName='FROM:type-store';
 /* istanbul ignore next */
 TypeBase.prototype.isValidTypedData=function isValidTypedData(typedData){
@@ -527,6 +530,9 @@ TypeStore.type.date.prototype.toExcelValue=function toExcelValue(typedValue){
 TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
     return 'd';
 };
+TypeStore.type.date.prototype.toJson=function toJson(typedValue){
+    return typedValue.toYmd();
+};
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
     var parts=[];
@@ -618,7 +624,9 @@ TypeStore.type.interval.prototype.toExcelType=function toExcelType(typedValue){
 TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
     return cell.v?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
 };
-
+TypeStore.type.interval.prototype.toJson=function toJson(typedValue){
+    return typedValue.toPlainString();
+};
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.timestamp.prototype.typeDbPg='timestamp';
