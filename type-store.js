@@ -531,7 +531,7 @@ TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
     return 'd';
 };
 TypeStore.type.date.prototype.toJson=function toJson(typedValue){
-    return typedValue.toYmd();
+    return typedValue?typedValue.toYmd():null;
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
@@ -625,7 +625,7 @@ TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
     return cell.v?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
 };
 TypeStore.type.interval.prototype.toJson=function toJson(typedValue){
-    return typedValue.toPlainString();
+    return typedValue?typedValue.toPlainString():null;
 };
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
