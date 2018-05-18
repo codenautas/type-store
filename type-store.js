@@ -154,13 +154,17 @@ TypeBase.prototype.toExcelType=function toExcelType(typedValue){
 TypeBase.prototype.fromExcelCell=function fromExcelCell(cell){
     return this.fromString(cell.w);
 };
-TypeBase.prototype.toJson=function toJson(typedValue){
-    return typedValue;
+TypeBase.prototype.toPlainJson=function toPlainJson(typedValue){
+    return this.toPlainString(typedValue);
+};
+TypeBase.prototype.fromPlainJson=function fromPlainJson(textOrNumberOrBoolean){
+    // para Number y Boolean se redefinirán en sus propios tipos
+    return this.fromString(textOrNumberOrBoolean);
 };
 TypeBase.prototype.typedControlName='FROM:type-store';
 /* istanbul ignore next */
 TypeBase.prototype.isValidTypedData=function isValidTypedData(typedData){
-    return false;
+    throw new Error('isValidTypedData not defined for type '+this.constructor.name)
 };
 TypeBase.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(typedData){
     if(!this.isValidTypedData(typedData)){
@@ -229,6 +233,12 @@ TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
 TypeStore.type.boolean.prototype.toLocalString=function toLocalString(typedValue){
     return TypeStore.messages.boolean[typedValue];
 };
+TypeStore.type.boolean.prototype.toPlainJson=function toPlainJson(typedValue){
+    return typedValue;
+};
+TypeStore.type.boolean.prototype.fromPlainJson=function fromPlainJson(textOrNumberOrBoolean){
+    return textOrNumberOrBoolean;
+};
 TypeStore.type.boolean.prototype.toHtml=function toHtmlBoolean(typedValue){
     return html.span({"class": "boolean"},[html.span({"class": "boolean-"+typedValue},this.toLocalString(typedValue))]);
 };
@@ -271,14 +281,11 @@ TypeStore.type.text.prototype.toHtml=function toHtmlText(typedValue){
     return html.span({"class": "text"}, answer);
 };
 TypeStore.type.text.prototype.rejectedChar = function rejectedChar(char, position){
-    return this.typeInfo.acceptedChars && this.typeInfo.acceptedChars.test(char);
+    return !!this.typeInfo.acceptedChars && !this.typeInfo.acceptedChars.test(char);
 };
-
-/*
 TypeStore.type.text.prototype.isValidTypedData=function isValidTypedData(typedData){
-    return 
+    return this.whyTypedDataIsInvalid(typedData)==null;
 };
-*/
 TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(typedData){
     if(typedData==null || typeof typedData === 'string'){
         if(!this.typeInfo.allowEmptyText && typedData===''){
@@ -306,6 +313,12 @@ TypeStore.typeNumber.prototype.inexactNumber=true;
 TypeStore.typeNumber.prototype.pg_OID=701;
 TypeStore.typeNumber.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toString();
+};
+TypeStore.typeNumber.prototype.toPlainJson=function toPlainJson(typedValue){
+    return typedValue;
+};
+TypeStore.typeNumber.prototype.fromPlainJson=function fromPlainJson(textOrNumberOrBoolean){
+    return textOrNumberOrBoolean;
 };
 TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPart,fParts){
     var str = this.toPlainString(typedValue);
@@ -378,7 +391,8 @@ TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt)
     self.setTypeInfo(number);
     return number;
 };
-
+TypeStore.type.hugeint.prototype.toPlainJson=TypeBase.prototype.toPlainJson;
+TypeStore.type.hugeint.prototype.fromPlainJson=TypeBase.prototype.fromPlainJson;
 TypeStore.type.integer=function TypeInteger(){ TypeStore.type.hugeint.apply(this,arguments); };
 TypeStore.type.integer.prototype=Object.create(TypeStore.type.hugeint.prototype);
 TypeStore.type.integer.prototype.maxValue= 2147483647;
@@ -423,18 +437,27 @@ TypeStore.type.decimal.prototype.fromExcelCell=function fromExcelCell(cell){
 TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); };
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
 TypeStore.type["ARRAY:text"].prototype.typeDbPg='text[]';
-TypeStore.type["ARRAY:text"].prototype.validateTypedData=function validateARRAY__Text(anyValue){
+TypeStore.type["ARRAY:text"].prototype.isValidTypedData=function isValidTypedData(typedData){
+    return this.whyTypedDataIsInvalid(typedData)==null;
+};
+TypeStore.type["ARRAY:text"].prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(anyValue){
     if(anyValue!=null){
         if(!(anyValue instanceof Array)){
-            throw new Error("Non an Array in type-store ARRAY:text");
+            return "Non an Array in type-store ARRAY:text";
         }else{
-            anyValue.forEach(function(anyElement, i){
-                if(typeof anyElement!=='string'){
-                    throw new Error("Non a string in type-store ARRAY:text["+i+"]");
+            return anyValue.reduce(function(accum, anyElement, i){
+                if(accum){
+                    return accum;
                 }
-            });
+                if(typeof anyElement!=='string'){
+                    return "Non a string in type-store ARRAY:text["+i+"]";
+                }else{
+                    return null;
+                }
+            },null);
         }
     }
+    return null;
 };
 TypeStore.type["ARRAY:text"].prototype.fromString=function fromString(stringWithArrayText){
     return stringWithArrayText.split(/\s*;\s*/g).map(function(text){ return text.trim(); });
@@ -500,7 +523,7 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     }
 };
 
-TypeStore.type.date = function TypeArrayDate(){ TypeBase.apply(this, arguments); };
+TypeStore.type.date = function TypeDate(){ TypeBase.apply(this, arguments); };
 TypeStore.type.date.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.date.prototype.typeDbPg='date';
 TypeStore.type.date.prototype.fromString=function fromString(text){
@@ -508,6 +531,9 @@ TypeStore.type.date.prototype.fromString=function fromString(text){
 };
 TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
     return cell.v?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
+};
+TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(typedData){
+    return this.whyTypedDataIsInvalid(typedData)==null;
 };
 TypeStore.type.date.prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(object){
     if(object==null){
@@ -529,9 +555,6 @@ TypeStore.type.date.prototype.toExcelValue=function toExcelValue(typedValue){
 };
 TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
     return 'd';
-};
-TypeStore.type.date.prototype.toJson=function toJson(typedValue){
-    return typedValue?typedValue.toYmd():null;
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
@@ -623,9 +646,6 @@ TypeStore.type.interval.prototype.toExcelType=function toExcelType(typedValue){
 };
 TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
     return cell.v?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
-};
-TypeStore.type.interval.prototype.toJson=function toJson(typedValue){
-    return typedValue?typedValue.toPlainString():null;
 };
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);

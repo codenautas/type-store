@@ -41,6 +41,7 @@ Tener un módulo que se encargue de:
   * saber cómo
     * leerlo de un input común del usuario (saber si es válido o no, por qué y como se transforma al tipo correspondiente) utilizando la configuración regional
     * transformarlo en un literal para envíar a la base de datos
+    * transformarlo en otros formatos complejos para interactuar por ejemplo con el Excel (u otros que aparezcan)
     * leerlo desde la base de datos
     * detectarlo desde distintos posibles formatos de entrada (para hacer input automático)
   * conocer
@@ -48,6 +49,67 @@ Tener un módulo que se encargue de:
 
 <!--lang:en--]
 # Goal
+
+<!--lang:es-->
+# Uso
+
+```js
+var TypeStore = require('../type-store');
+
+/* Ejemplo sonso */
+var typeDate = TypeStore.typerFrom({typeName:'date', label:'fecha actual', name:'fecha'})
+var date = typeDate.fromString("2018-04-30"); // lo lee desde un formato canónico (no humano)
+console.log('la fecha es:', typeDate.toLocalString(date));
+
+/* La gracia es cuando uno itera sin que esté predefinido el tipo: */
+fieldList.forEach(function(fieldDef){
+    var typer = TypeStore.typerFrom(fieldDef);
+    var text = readFromCommandLineFromAHumman('ingrese '+fieldDef.name);
+    try{
+        var valor = typer.fromLocalString(text);
+        var textForSQL = typer.toPostgres(valor);
+        sqlQuery("update table set %I = %L",[fieldDef.name, textForSQL]);
+    }catch(err){
+        console.log('no se pudo convertir o grabar')
+    }
+})
+
+```
+
+<!--lang:en--]
+# Usage
+<!--lang:es-->
+# Funciones
+
+función                 |predeterminado | uso
+------------------------|---------------|-------------------------------
+**textos de máquina**   |               |por ejemplo 1810-05-25 ó 1919.44
+toPlainString(v)        |               |manda a texto de máquina
+fromString(s)           |               |lee desde un texto de máquina
+rejectedChar(c,i)       |*false*        |indica si un caracter debe rechazarse para una posición
+isDataValid(v)          |               |
+whyTypedDataIsInvalid(s)|               |devuelve un texto explicando por qué un string es inválido
+validateTypedData(v)    |               |indica si el valor es del tipo especificado
+toHtmlText(v)           |*<span class=...>text</span>*|devuelve algo lindo para mostrar y con la clase
+toPlainJson(v)          |toPlainString  |pasa a un texto que pueda meterse en JSON (salvo para boolean y numeric)
+fromPlainJson(s||n||b)  |               |recibe un valor obtenido de JSON.parse
+**textos locales humanos**|             |por ejemplo 25/5/1810 ó 1.919,44
+toLocalString(v)        |               |devuelve un texto humano 
+fromLocalString(s)      |               |obtiene el valor a partir de un texto humano
+isValidLocalString(s)   |               |indica si un texto humano es válido
+*typedControlName*      |               |cómo lo conocemos dentro de typedControls
+**para Postgresql**     |               |para postgresql
+*typeDbPg*              |               |el tipo en la base de datos
+*pgSpecialParse*        |               |si la librería *pg* puede darse cuenta sólo cómo generar un tipo en Javascript
+*pg_OID*                |               |es el OID de postgres
+**para Excel**          |               |transforman en celdas
+toExcelValue(v)         |toPlainString  |
+toExcelType(v)          |*s*            |el caracter que indica el tipo de la celda
+fromExcelCell(cell)     |               |interpreta una celda de excel
+
+
+<!--lang:en--]
+# Usage
 [!--lang:*-->
 
 <!--lang:es-->

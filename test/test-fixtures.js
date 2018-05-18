@@ -111,6 +111,7 @@ describe("fixtures", function(){
                 var obtained;
                 if('fromString' in fixture){
                     obtained = obtainedFromString = typer.fromString(fixture.fromString);
+                    discrepances.showAndThrow(typer.isValidTypedData(obtained), true);
                 }
                 if('construct' in fixture){
                     obtainedFromConstructor = typeDef.constructorFunction(fixture.construct);
