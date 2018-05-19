@@ -214,6 +214,7 @@ TypeBase.prototype.getDomFixtures=function getDomFixtures(){
         {tagName:'input', attributes:{type:'text'}}
     ];
 };
+TypeBase.prototype.emptyValue=null;
 Object.defineProperty(TypeBase.prototype, 'align', {
     get: function(){ return TypeStore.locale.align; }
 });
@@ -296,6 +297,9 @@ TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(ty
     }
     return 'not a text in input';
 };
+Object.defineProperty(TypeStore.type.text.prototype, 'emptyValue',{
+    get:function(){ return this.typeInfo.allowEmptyText && !this.typeInfo.nullable?'':null; }
+});
 
 TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); };
 TypeStore.typeNumber.prototype = Object.create(TypeBase.prototype);
