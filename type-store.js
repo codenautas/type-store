@@ -298,7 +298,7 @@ TypeStore.type.text.prototype.whyTypedDataIsInvalid=function isValidTypedData(ty
     return 'not a text in input';
 };
 Object.defineProperty(TypeStore.type.text.prototype, 'emptyValue',{
-    get:function(){ return this.typeInfo.allowEmptyText && !this.typeInfo.nullable?'':null; }
+    get:function(){ return this.typeInfo.allowEmptyText && 'nullable' in this.typeInfo && !this.typeInfo.nullable?'':null; }
 });
 
 TypeStore.typeNumber = function TypeNumber(){ TypeBase.apply(this, arguments); };
