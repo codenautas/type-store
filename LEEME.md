@@ -87,7 +87,7 @@ función                 |predeterminado | uso
 toPlainString(v)        |               |manda a texto de máquina
 fromString(s)           |               |lee desde un texto de máquina
 rejectedChar(c,i)       |*false*        |indica si un caracter debe rechazarse para una posición
-isDataValid(v)          |               |
+isValidTypedData(v)     |               |
 whyTypedDataIsInvalid(s)|               |devuelve un texto explicando por qué un string es inválido
 validateTypedData(v)    |               |indica si el valor es del tipo especificado
 toHtmlText(v)           |*<span class=...>text</span>*|devuelve algo lindo para mostrar y con la clase
