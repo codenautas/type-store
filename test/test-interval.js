@@ -6,6 +6,21 @@ var discrepances = require('discrepances');
 var assert = require('assert');
 var TypeStore = require("../type-store.js");
 
+describe("date", function(){
+    it('generate dow', function(){
+        TypeStore.options.withDateDowAttr=true;
+        var d=bestGlobals.date.today();
+        var typer = new TypeStore.type.date();
+        var str = typer.toHtmlText(d);
+        discrepances.showAndThrow(
+            str.substr(0,103),
+            "<span current-century=true current-year=true current-month=true current-day=true date-dow="+
+            d.getDay()+" class=date>"
+        );
+        TypeStore.options.withDateDowAttr=false;
+    })
+});
+
 describe("interval", function(){
     var typer = new TypeStore.type.interval();
     [

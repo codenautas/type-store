@@ -133,8 +133,9 @@ TypeBase.prototype.toHtml=function toHtml(typedValue){
                 }
                 return html.span(attr, part);
             },
-            function Parts(parts, className){
-                return html.span({class:className}, parts);
+            function Parts(parts, className, otherAttrs){
+                var attrs=otherAttrs?changing(otherAttrs,{class:className}):{class:className};
+                return html.span(attrs, parts);
             }
         );
     }else{
@@ -561,7 +562,24 @@ TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
     return 'd';
 };
 TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPart, fParts){
+    var attrs = {};
+    var today = bestGlobals.date.today();
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
+    if(Math.floor(today.getFullYear()/100)==Math.floor(typedValue.getFullYear()/100)){
+        attrs["current-century"]=true;
+    }
+    if(today.getFullYear()==typedValue.getFullYear()){
+        attrs["current-year"]=true;
+        if(today.getMonth()==typedValue.getMonth()){
+            attrs["current-month"]=true;
+            if(today.getDate()==typedValue.getDate()){
+                attrs["current-day"]=true;
+            }
+        }
+    }
+    if(TypeStore.options.withDateDowAttr){
+        attrs["date-dow"]=typedValue.getDay();
+    }
     var parts=[];
     TypeStore.locale.datetime.partsOrder.forEach(function(partName, i){
         if(i){
@@ -576,7 +594,7 @@ TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPa
         }
         parts.push(part);
     });
-    return fParts(parts, "date");
+    return fParts(parts, "date", attrs);
 };
 TypeStore.type.date.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     var arr=[new Date().getFullYear(),0,0];

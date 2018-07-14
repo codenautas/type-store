@@ -1,7 +1,7 @@
 {
   "name": "type-store",
   "description": "type ecosystem",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "repository": "codenautas/type-store",
   "license": "MIT",
@@ -12,17 +12,17 @@
   ],
   "dependencies": {
     "big.js": "~5.1.2",
-    "best-globals": "~0.10.4",
+    "best-globals": "~0.10.5",
     "js-to-html": "~1.0.3",
     "json4all": "~0.3.10",
-    "like-ar": "~0.2.2"
+    "like-ar": "~0.2.7"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~5.2.0",
-    "postgres-interval": "~1.1.1",
-    "discrepances": "~0.2.2"
+    "postgres-interval": "~1.1.2",
+    "discrepances": "~0.2.3"
   },
   "engines": {
     "node": ">= 4"
