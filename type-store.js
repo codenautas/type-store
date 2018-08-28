@@ -230,10 +230,10 @@ TypeStore.type.boolean.prototype.toPlainString=function toPlainString(typedValue
 };
 TypeStore.type.boolean.prototype.fromString=function fromString(textWithValue){
     var falseInitials={'n':true,'N':true,'0':true,'2':true,'F':true,'f':true,'\u043d':true,'\u041d':true,'\u0147':true,'\u0148':true};
-    return !falseInitials[textWithValue[0]];
+    return textWithValue?!falseInitials[textWithValue[0]]:null;
 };
-TypeStore.type.boolean.prototype.toLocalString=function toLocalString(typedValue){
-    return TypeStore.messages.boolean[typedValue];
+TypeStore.type.boolean.prototype.fromExcelCell=function fromExcelCell(cell){
+    return this.fromString(cell.w);
 };
 TypeStore.type.boolean.prototype.toPlainJson=function toPlainJson(typedValue){
     return typedValue;
