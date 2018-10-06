@@ -1,7 +1,7 @@
 {
   "name": "type-store",
   "description": "type ecosystem",
-  "version": "0.2.26",
+  "version": "0.2.27",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "repository": "codenautas/type-store",
   "license": "MIT",
