@@ -32,9 +32,9 @@ describe("fixtures", function(){
   });
   [
       {typeName:'boolean', fixtures:[
-          {fromString:'s', value:true , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
-          {fromString:'f', value:false, toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
-          {                value:null , toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
+          {fromString:'s', value:true , fromPlainJson:'true' , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
+          {fromString:'f', value:false, fromPlainJson:'false', toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
+          {                value:null , fromPlainJson:'null' , toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
       ]},
       {typeName:'text', fixtures:[
           {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
@@ -49,7 +49,7 @@ describe("fixtures", function(){
       ]},
       {typeName:'integer', fixtures:[
           {fromString:'-646', value:-646, toHtmlText:"<span class=number><span class='number-sign'>-</span><span class='number-miles'>646</span></span>"},
-          {fromString:'2147483648',
+          {fromString:'2147483648', 
            fromStringError:new TypeError ('type-store: value out of range')
           }
       ], rejectChars:['.','x',' ']},
@@ -122,6 +122,18 @@ describe("fixtures", function(){
                     obtained = obtainedFromString = typer.fromString(fixture.fromString);
                     discrepances.showAndThrow(typer.isValidTypedData(obtained), true);
                 }
+                //if('value' in fixture){
+                //    if('plainJson' in fixture){
+                //        discrepances.showAndThrow(typer.fromPlainJson(fixture.value), fixture.plainJson);
+                //        discrepances.showAndThrow(typer.toPlainJson(fixture.value)  , fixture.plainJson);
+                //    }else if(typeof fixture.value == "number") {
+                //        discrepances.showAndThrow(typer.fromPlainJson(fixture.value), fixture.value);
+                //        discrepances.showAndThrow(typer.toPlainJson(fixture.value)  , fixture.value);
+                //    }else{
+                //        discrepances.showAndThrow(typer.fromPlainJson(fixture.value), fixture.value);
+                //        discrepances.showAndThrow(typer.toPlainJson(fixture.value)  , fixture.value);
+                //    }
+                //}
                 if('construct' in fixture){
                     obtainedFromConstructor = typeDef.constructorFunction(fixture.construct);
                     obtained = obtainedFromConstructor;
