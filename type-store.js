@@ -262,8 +262,8 @@ TypeStore.type.text.prototype.toPlainString=function toPlainString(typedValue){
 TypeStore.type.text.prototype.fromString=function fromString(textWithValue){
     return textWithValue;
 };
-TypeStore.type.text.prototype.fromLocalString=function fromLocalString(textWithValue){
-    if(this.typeInfo.toUpperWithoutDiacritics){
+TypeStore.type.text.postInputs={
+    upperWithoutDiacritics:function toUpperWithoutDiacritics(textWithValue){
         return textWithValue.toUpperCase()
             .replace(/[áÁàÀ]/g,'A')
             .replace(/[éÉèÈ]/g,'E')
@@ -271,7 +271,18 @@ TypeStore.type.text.prototype.fromLocalString=function fromLocalString(textWithV
             .replace(/[óÓòÒ]/g,'O')
             .replace(/[úÚùÙüÜ]/g,'U')
             .replace(/[ñ]/g,'Ñ')
-            .replace(/[^A-Z0-9_]/g,'_')
+            .replace(/[^A-Z0-9_]/g,'_');
+    },
+    upperSpanish:function upperSpanish(textWithValue){
+        return textWithValue.toLocaleUpperCase();
+    }
+};
+TypeStore.type.text.prototype.fromLocalString=function fromLocalString(textWithValue){
+    if(this.typeInfo.toUpperWithoutDiacritics){
+        return TypeStore.type.text.postInputs.upperWithoutDiacritics(textWithValue);
+    }
+    if(this.typeInfo.postInput){
+        return TypeStore.type.text.postInputs[this.typeInfo.postInput](textWithValue);
     }
     return textWithValue;
 };
