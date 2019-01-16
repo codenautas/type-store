@@ -275,6 +275,14 @@ TypeStore.type.text.postInputs={
     },
     upperSpanish:function upperSpanish(textWithValue){
         return textWithValue.toLocaleUpperCase();
+    },
+    parseDecimal:function parseDecimal(textWithValue){
+        var typeDecimal = TypeStore.typerFrom({typeName:'decimal'});
+        try{
+            return typeDecimal.fromString(textWithValue).toString();
+        }catch(err){
+            return null
+        }
     }
 };
 TypeStore.type.text.prototype.fromLocalString=function fromLocalString(textWithValue){
