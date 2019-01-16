@@ -279,7 +279,12 @@ TypeStore.type.text.postInputs={
     parseDecimal:function parseDecimal(textWithValue){
         var typeDecimal = TypeStore.typerFrom({typeName:'decimal'});
         try{
-            return typeDecimal.fromString(textWithValue).toString();
+            var value = typeDecimal.fromString(textWithValue);
+            if(isNaN(value)){
+                throw new Error('NaN value');
+            }else{
+                return value.toString();
+            }
         }catch(err){
             return null
         }
