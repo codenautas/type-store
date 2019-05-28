@@ -688,10 +688,13 @@ TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValu
     */
 };
 TypeStore.type.interval.prototype.toPlainJson=function toPlainJson(typedValue){
-    return typedValue.toYmdHmsM();
+    return typedValue.toPlainString();
 };
 TypeStore.type.interval.prototype.fromPlainJson=function fromPlainJson(typedValue){
     if(typedValue instanceof Object){
+        if(typedValue.timeInterval){
+            return bestGlobals.timeInterval(typedValue.timeInterval);
+        }
         return bestGlobals.timeInterval(typedValue); 
     }else{
         return this.fromString(typedValue);
