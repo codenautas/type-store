@@ -687,6 +687,16 @@ TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValu
     return t;
     */
 };
+TypeStore.type.interval.prototype.toPlainJson=function toPlainJson(typedValue){
+    return typedValue.toYmdHmsM();
+};
+TypeStore.type.interval.prototype.fromPlainJson=function fromPlainJson(typedValue){
+    if(typedValue instanceof Object){
+        return bestGlobals.timeInterval(typedValue); 
+    }else{
+        return this.fromString(typedValue);
+    }
+};
 TypeStore.type.interval.prototype.toExcelValue=function toExcelValue(typedValue){
     return typedValue.timeInterval.ms?typedValue.timeInterval.ms/(1000*60*60*24):null;
 };
