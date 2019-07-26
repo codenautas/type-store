@@ -199,6 +199,9 @@ TypeBase.prototype.toLocalString=function toLocalString(typedValue){
 TypeBase.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue);
 };
+TypeBase.prototype.fromUserInput=function fromUserInput(textWithUserInput){
+    return this.fromLocalString(textWithUserInput);
+};
 TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalValue){
     try{
         var typedValue = this.fromLocalString(textWithLocalValue);
@@ -380,6 +383,11 @@ TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedD
 };
 TypeStore.typeNumber.prototype.fromLocalString=function fromLocalString(textWithLocalValue){
     return this.fromString(textWithLocalValue.replace(new RegExp("\\"+TypeStore.locale.number.milesSeparator.split('').join('\\'),'g'),''));
+};
+TypeStore.typeNumber.prototype.fromUserInput=function fromUserInput(textWithUserInput){
+    return this.fromString(
+        TypeStore.locale.number.decimalSeparator=='.'?textWithUserInput:textWithUserInput.replace(/[.]/,TypeStore.locale.number.decimalSeparator)
+    );
 };
 TypeStore.typeNumber.prototype.toExcelType=function toExcelType(typedValue){
     return 'n';
