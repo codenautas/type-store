@@ -570,6 +570,14 @@ TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
 TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
+    if(cell.v && cell.t=='s' && isNaN(cell.v)){
+        try{
+            return this.fromLocalString(cell.v);
+        }catch(err){
+            console.log('esta fecha no la pude',cell.v)
+            throw err;
+        }
+    }
     return cell.v?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
 };
 TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(typedData){
