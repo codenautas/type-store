@@ -472,7 +472,7 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
     return number;
 };
 TypeStore.type.decimal.prototype.fromExcelCell=function fromExcelCell(cell){
-    return cell.v?(cell.t === 'n')?this.fromString(cell.v):cell.v.replace(/,/g, '.'):null;
+    return cell.v!=null?(cell.t === 'n')?this.fromString(cell.v):cell.v.replace(/,/g, '.'):null;
 };
 TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); };
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
@@ -578,7 +578,7 @@ TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
             throw err;
         }
     }
-    return cell.v?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
+    return cell.v!=null?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
 };
 TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(typedData){
     return this.whyTypedDataIsInvalid(typedData)==null;
@@ -723,7 +723,7 @@ TypeStore.type.interval.prototype.toExcelType=function toExcelType(typedValue){
     return 'n';
 };
 TypeStore.type.interval.prototype.fromExcelCell=function fromExcelCell(cell){
-    return cell.v?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
+    return cell.v!=null?bestGlobals.timeInterval(cell.v*1000*60*60*24).toPlainString():null;
 };
 TypeStore.type.timestamp = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
 TypeStore.type.timestamp.prototype = Object.create(TypeBase.prototype);
