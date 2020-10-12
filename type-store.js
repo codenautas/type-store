@@ -572,6 +572,9 @@ TypeStore.type.date.prototype.fromString=function fromString(text){
 TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
     if(cell.v && cell.t=='s' && isNaN(cell.v)){
         try{
+            if(/^\d{3,}-\d{1,2}-\d{1,2}$/.test(cell.v)){
+                return bestGlobals.date.iso(cell.v);
+            }
             return this.fromLocalString(cell.v);
         }catch(err){
             console.log('esta fecha no la pude',cell.v)
