@@ -34,7 +34,9 @@ describe("fixtures", function(){
       {typeName:'boolean', fixtures:[
           {fromString:'s', value:true , fromPlainJson:'true' , toPlainString:'true' , local:'sí', fromLocal:'s', toHtmlText:"<span class=boolean><span class='boolean-true'>sí</span></span>"},
           {fromString:'f', value:false, fromPlainJson:'false', toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
+          {fromString:' no', value:false, fromPlainJson:'false', toPlainString:'false', local:'no', fromLocal:'N', toHtmlText:"<span class=boolean><span class='boolean-false'>no</span></span>"},
           {                value:null , fromPlainJson:'null' , toHtmlText:"<span class=boolean><span class='boolean-null'></span></span>"},
+          {fromString:' ', value:null , fromPlainJson:'null' , toPlainString:'null', local:''},
       ]},
       {typeName:'text', fixtures:[
           {fromString:'-64x6', value:'-64x6', toPlainString:'-64x6', local:'-64x6', toHtmlText:"<span class=text>-64x6</span>"},
