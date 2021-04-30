@@ -563,6 +563,11 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     }
 };
 
+TypeStore.type.jsona = function TypeArrayJsonA(){ TypeStore.type.jsonb.apply(this, arguments); };
+TypeStore.type.jsona.prototype = Object.create(TypeStore.type.jsonb.prototype);
+TypeStore.type.jsona.typeDbPg='json';
+TypeStore.type.jsona.pg_OID=114;
+
 TypeStore.type.date = function TypeDate(){ TypeBase.apply(this, arguments); };
 TypeStore.type.date.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.date.prototype.typeDbPg='date';

@@ -1,7 +1,7 @@
 {
   "name": "type-store",
   "description": "type ecosystem",
-  "version": "0.2.39",
+  "version": "0.2.40",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "repository": "codenautas/type-store",
   "license": "MIT",
@@ -11,18 +11,18 @@
     "postgres-interval4client.js"
   ],
   "dependencies": {
-    "big.js": "~6.0.2",
-    "best-globals": "~0.10.30",
-    "js-to-html": "~1.0.11",
-    "json4all": "~0.3.10",
-    "like-ar": "~0.2.19"
+    "big.js": "~6.1.0",
+    "best-globals": "~0.10.31",
+    "js-to-html": "~1.2.0",
+    "json4all": "~1.1.0",
+    "like-ar": "~0.3.3"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
-    "mocha": "~8.2.1",
+    "mocha": "~8.3.2",
     "postgres-interval": "~3.0.0",
-    "discrepances": "~0.2.4"
+    "discrepances": "~0.2.6"
   },
   "engines": {
     "node": ">= 4"

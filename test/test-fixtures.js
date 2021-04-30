@@ -75,7 +75,14 @@ describe("fixtures", function(){
            local:"[null,null,\"hi\",{\"a\":7,\"b\":false}]"
           },
       ]},
-      {typeName:'interval', fixtures:[
+      {typeName:'jsona', fixtures:[
+        {fromString:'{"a": "b"}', toPlainString:'{"a":"b"}', value:{a:'b'}, local:'{"a":"b"}'},
+        {value:[null, null, 'hi', {a:7, b:false}], 
+         toHtmlText:"<span class='json-array'><span class='json-array-delimiter'>[</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-string'>&quot;hi&quot;</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'><span class='json-object-delimiter'>{</span><span class='json-object-key'>&quot;a&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-number'>7</span></span><span class='json-object-separator'>,</span><span class='json-object-key'>&quot;b&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-boolean'>false</span></span><span class='json-object-delimiter'>}</span></span></span><span class='json-array-delimiter'>]</span></span>",
+         local:"[null,null,\"hi\",{\"a\":7,\"b\":false}]"
+        },
+    ]},
+    {typeName:'interval', fixtures:[
           {fromString:'13:40:00', toPlainString:'13:40:00', construct:{hours:13, minutes:40, seconds:0}},
           {fromString:"3:30"    , toPlainString:'3:30:00' , construct:{hours:3, minutes:30}},
           {fromString:"13h20'"  , toPlainString:'13:20:00', construct:{hours:13, minutes:20}},
