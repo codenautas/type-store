@@ -582,7 +582,7 @@ TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
             }
             return this.fromLocalString(cell.v);
         }catch(err){
-            console.log('esta fecha no la pude',cell.v)
+            err.message+= ' ' + cell.v;
             throw err;
         }
     }
