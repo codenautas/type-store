@@ -586,6 +586,16 @@ TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
             throw err;
         }
     }
+    /*
+    Ojo con: https://www.npmjs.com/package/xlsx#utility-functions
+
+    Epochs: 1900 and 1904 (click to show)
+    Excel supports two epochs (January 1 1900 and January 1 1904), see "1900 vs. 1904 Date System" article. 
+    The workbook's epoch can be determined by examining the workbook's wb.Workbook.WBProps.date1904 property:
+
+    !!(((wb.Workbook||{}).WBProps||{}).date1904)    
+
+    */
     return cell.v!=null?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
 };
 TypeStore.type.date.prototype.isValidTypedData=function isValidTypedData(typedData){
