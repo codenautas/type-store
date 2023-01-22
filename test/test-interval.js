@@ -13,9 +13,9 @@ describe("date", function(){
         var typer = new TypeStore.type.date();
         var str = typer.toHtmlText(d);
         discrepances.showAndThrow(
-            str.substr(0,103),
-            "<span current-century=true current-year=true current-month=true current-day=true date-dow="+
-            d.getDay()+" class=date>"
+            str.substr(0,83),
+            "<span class=date current-century current-year current-month current-day date-dow="+
+            d.getDay()+">"
         );
         TypeStore.options.withDateDowAttr=false;
     })

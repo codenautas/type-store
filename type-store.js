@@ -134,7 +134,7 @@ TypeBase.prototype.toHtml=function toHtml(typedValue){
                 return html.span(attr, part);
             },
             function Parts(parts, className, otherAttrs){
-                var attrs=otherAttrs?changing(otherAttrs,{class:className}):{class:className};
+                var attrs=otherAttrs?changing({class:className},otherAttrs):{class:className};
                 return html.span(attrs, parts);
             }
         );
@@ -376,7 +376,7 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
             rta.push(fPart(decimals,"number-decimals"));
         }
     });
-    return fParts(rta,"number");
+    return fParts(rta, "number", {"number-sign":typedValue>0?"positive":typedValue<0?"negative":"zero"});
 };
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;

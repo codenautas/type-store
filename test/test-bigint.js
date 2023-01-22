@@ -41,7 +41,7 @@ describe("bigint", function(){
         var value = typeDecimal.fromString(txt);
         var htmlText = typeDecimal.toHtmlText(value);
         discrepances.showAndThrow(htmlText,
-            "<span class=number><span class='number-miles'>12</span>"+
+            "<span class=number number-sign=positive><span class='number-miles'>12</span>"+
             "<span class='number-separator'> . </span>"+
             "<span class='number-miles'>345</span>"+
             "<span class='number-dot'> , </span>"+
@@ -55,7 +55,7 @@ describe("bigint", function(){
         var value = typeDecimal.fromString(txt);
         var htmlText = typeDecimal.toHtmlText(value);
         discrepances.showAndThrow(htmlText,
-            "<span class=number><span class='number-miles'>12</span>"+
+            "<span class=number number-sign=positive><span class='number-miles'>12</span>"+
             "<span class='number-separator' non-copyable=','></span>"+
             "<span class='number-miles'>345</span>"+
             "<span class='number-dot'>.</span>"+

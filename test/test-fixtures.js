@@ -50,19 +50,20 @@ describe("fixtures", function(){
       {typeName:'hugeint', fixtures:[
       ]},
       {typeName:'integer', fixtures:[
-          {fromString:'-646', value:-646, toHtmlText:"<span class=number><span class='number-sign'>-</span><span class='number-miles'>646</span></span>"},
+          {fromString:'-646', value:-646, toHtmlText:"<span class=number number-sign=negative><span class='number-sign'>-</span><span class='number-miles'>646</span></span>"},
           {fromString:'2147483648', 
            fromStringError:new TypeError ('type-store: value out of range')
           }
       ], rejectChars:['.','x',' ']},
       {typeName:'decimal', fixtures:[
-          {fromString:'2147483646', value:2147483646, local:'2.147.483.646', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-separator'>.</span><span class='number-miles'>147</span><span class='number-separator'>.</span><span class='number-miles'>483</span><span class='number-separator'>.</span><span class='number-miles'>646</span></span>"},
-          {fromString:'2,3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
-          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2.147.483.648,010000000001'}
+          {fromString:'2147483646', value:2147483646, local:'2.147.483.646', toHtmlText:"<span class=number number-sign=positive><span class='number-miles'>2</span><span class='number-separator'>.</span><span class='number-miles'>147</span><span class='number-separator'>.</span><span class='number-miles'>483</span><span class='number-separator'>.</span><span class='number-miles'>646</span></span>"},
+          {fromString:'2,3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number number-sign=positive><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
+          {fromString:'2147483648.010000000001', toPlainString:'2147483648.010000000001', value:new Big('2147483648.010000000001'), local:'2.147.483.648,010000000001'},
+          {fromString:'0', toPlainString:'0', value:0, local:'0', toHtmlText:"<span class=number number-sign=zero><span class='number-miles'>0</span></span>"}
       ], invalidValues:['x', new Date()]
       , rejectChars:['x',' ']},
       {typeName:'double', fixtures:[
-          {fromString:'2.3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
+          {fromString:'2.3', value:2.3, toPlainString:'2.3', local:'2,3', toHtmlText:"<span class=number number-sign=positive><span class='number-miles'>2</span><span class='number-dot'>,</span><span class='number-decimals'>3</span></span>"},
       ], invalidValues:['9.3']},
       {typeName:'ARRAY:text', fixtures:[
           {fromString:'a;b;cc', toPlainString:'a;b;cc', value:['a','b','cc']},
@@ -94,12 +95,12 @@ describe("fixtures", function(){
           {fromString:'6'       , toPlainString:'6:00:00'},
       ], typeInfo:{typeName:'interval', timeUnit:'hours'}},
       {typeName:'date', fixtures:[
-          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span current-century=true class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>20</span>17</span></span>"},
+          {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date current-century><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>20</span>17</span></span>"},
           {fromString:currYear+'-'+ZnoCurrMonth+'-23', toPlainString:currYear+'-'+ZnoCurrMonth+'-23', 
            value:bestGlobals.date.iso(currYear+'-'+noCurrMonth+'-23'), 
            local:'23/'+noCurrMonth+'/'+currYear, 
            fromLocal:'23/'+noCurrMonth+'', 
-           toHtmlText:"<span current-century=true current-year=true class=date><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>"+noCurrMonth+"</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>"+currYear.substr(0,2)+"</span>"+currYear.substr(2,2)+"</span></span>"
+           toHtmlText:"<span class=date current-century current-year><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>"+noCurrMonth+"</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>"+currYear.substr(0,2)+"</span>"+currYear.substr(2,2)+"</span></span>"
           },
           {fromString:'4'       , fromStringError:new Error('invalid date')},
       ], constructorFunction:bestGlobals.date.iso
