@@ -617,7 +617,7 @@ TypeStore.type.date.prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.toYmd();
 };
 TypeStore.type.date.prototype.toExcelValue=function toExcelValue(typedValue){
-    return typedValue.toYmd();
+    return typedValue;
 };
 TypeStore.type.date.prototype.toExcelType=function toExcelType(typedValue){
     return 'd';
