@@ -92,9 +92,11 @@ Big.prototype.sameValue=function(other){
     return other instanceof Big && this.toString() == other.toString();
 };
 
-Big.prototype.toPostgres = function toPostgres(){
+Big.prototype.toSqlString = function toSqlString(){
     return this.toString();
 };
+
+Big.prototype.toPostgres = Big.prototype.toSqlString;
 
 TypeStore.class.Big = function TypeStoreBig(x, typeInfo){
     Big.call(this,x);
