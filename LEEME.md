@@ -105,6 +105,11 @@ toExcelValue(v)         |toPlainString  |
 toExcelType(v)          |*s*            |el caracter que indica el tipo de la celda
 fromExcelCell(cell)     |               |interpreta una celda de excel
 
+```sql
+select * 
+  from pg_type
+  where oid in (701,1700,23,20,1700,3802,114,1186,1114) or typname like '%time%' or typname like '%range%';
+```
 
 <!--lang:en--]
 # Usage

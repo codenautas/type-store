@@ -761,11 +761,45 @@ TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedVal
     return typedValue.toYmdHmsM();
 };
 
-/*
-Interval.prototype.toLiteral=function(){
-    return this.toString();
+
+TypeStore.type.time = function TypeArrayTime(){ TypeBase.apply(this, arguments); };
+TypeStore.type.time.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.time.prototype.typeDbPg='time';
+TypeStore.type.time.prototype.pgSpecialParse=true;
+TypeStore.type.time.prototype.toPlainString=function toPlainString(typedValue){
+    return typedValue+'';
 };
-*/
+TypeStore.type.time.prototype.pg_OID=1083;
+TypeStore.type.time.prototype.partDefs=[
+    {name:'hours'  , optative:false, sufix:':' },
+    {name:'minutes', optative:false, sufix:':' , twoDigits:true },
+    {name:'seconds', optative:false, sufix:''  , twoDigits:true },
+];
+// constructorFunction:new PostgresInterval().constructor,
+TypeStore.type.time.prototype.regExp=/^\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
+TypeStore.type.time.prototype.fromString=function fromString(stringWithTime){
+    var value = this.toLocalString(stringWithTime);
+    if (value.length <1 ) throw new TypeError("NOT time")
+    return value;
+};
+TypeStore.type.time.prototype.isValidTypedData=function isValidTypedData(object){
+    return object === null || this.regExp.test(object);
+};
+TypeStore.type.time.prototype.toLocalParts=function toLocalParts(typedValue,fPart,fParts){
+    var str = this.toPlainString(typedValue);
+    var rta = [];
+    str.replace(/^\s*0?([1-2]?\d)\:(\d\d)(\:(\d\d))?$/, function(str, hour, minutes, dot, seconds){
+        rta.push(fPart(hour,"time-hour"));
+        rta.push(fPart(':',"time-colon"));
+        rta.push(fPart(minutes,"time-min"));
+        if (seconds != '00' && seconds != null) {
+            rta.push(fPart(':',"time-colon"));
+            rta.push(fPart(seconds,"time-sec"));
+        }
+    });
+    return fParts(rta, "time");
+};
+
 // PostgresInterval.prototype.typeStore={type:'interval'};
 
 json4all.addType(bestGlobals.TimeInterval,{

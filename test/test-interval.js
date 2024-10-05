@@ -50,3 +50,30 @@ describe("interval", function(){
         });
     });
 });
+
+describe("time", function(){
+    var typer = new TypeStore.type.time();
+    [
+        {input:'15:40:00', output:'15:40', interval:'15:40'},
+        {input:"05:30"   , output:'5:30' , interval:'5:30' },
+        {input:'4'       , output:new TypeError('NOT time')},
+    ].forEach(function(fixture){
+        function toTime(x){ return x};
+        it("accept input \""+fixture.input+"\"", function(){
+            try{
+                var obtainedTime = typer.fromString(fixture.input, fixture.typeInfo);
+                discrepances.showAndThrow(obtainedTime, toTime(fixture.interval));
+                if(fixture.typeInfo){
+                    var specificTyper = TypeStore.typerFrom(changing({typeName:'interval'}, fixture.typeInfo));
+                    var specificObtainedInterval = specificTyper.fromString(fixture.input);
+                    discrepances.showAndThrow(specificObtainedInterval, obtainedTime);
+                }
+                discrepances.showAndThrow(obtainedTime, toTime(fixture.interval));
+                var obtainedOutput=typer.toPlainString(obtainedTime);
+            }catch(err){
+                obtainedOutput=err;
+            }
+            discrepances.showAndThrow(obtainedOutput, fixture.output);
+        });
+    });
+});
