@@ -761,7 +761,7 @@ TypeStore.type.timestamp.prototype.toPlainString=function toPlainString(typedVal
     return typedValue.toYmdHmsM();
 };
 
-
+// https://www.postgresql.org/docs/current/sql-createtype.html
 TypeStore.type.time = function TypeArrayTime(){ TypeBase.apply(this, arguments); };
 TypeStore.type.time.prototype = Object.create(TypeBase.prototype);
 TypeStore.type.time.prototype.typeDbPg='time';
@@ -799,6 +799,27 @@ TypeStore.type.time.prototype.toLocalParts=function toLocalParts(typedValue,fPar
     });
     return fParts(rta, "time");
 };
+
+// https://www.postgresql.org/docs/current/sql-createtype.html
+// https://www.postgresql.org/docs/current/rangetypes.html
+
+/** @param {{typeName:string, pg_OID?:number, typeDbPg?:string}} param */
+function rangeOf(param){
+    var result = function TypeRangeof(){ TypeBase.apply(this, arguments); };
+    result.prototype.toPlainString=function toPlainString(typedValue){
+        return typedValue;
+    };
+    result.prototype.fromString=function fromString(textValue){
+        return textValue;
+    };
+    result.prototype.typeDbPg=param.typeDbPg || param.typeName+'_range';
+    if (param.pg_OID) result.prototype.pg_OID=param.pg_OID;
+    return result
+}
+
+TypeStore.type.time_range=rangeOf({typeName:'time'});
+TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID:3908});
+
 
 // PostgresInterval.prototype.typeStore={type:'interval'};
 

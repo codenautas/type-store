@@ -1,14 +1,15 @@
 {
   "name": "type-store",
   "description": "type ecosystem",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "repository": "codenautas/type-store",
   "license": "MIT",
   "main": "type-store.js",
   "files": [
     "type-store.js",
-    "postgres-interval4client.js"
+    "postgres-interval4client.js",
+    "postgres"
   ],
   "dependencies": {
     "big.js": "^6.2.2",
