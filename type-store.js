@@ -800,6 +800,11 @@ TypeStore.type.time.prototype.toLocalParts=function toLocalParts(typedValue,fPar
     return fParts(rta, "time");
 };
 
+Object.defineProperty(TypeStore.type.time.prototype, 'align', {
+    get: function(){ return TypeStore.locale.number.align; }
+});
+
+
 // https://www.postgresql.org/docs/current/sql-createtype.html
 // https://www.postgresql.org/docs/current/rangetypes.html
 
