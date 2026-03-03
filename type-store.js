@@ -811,6 +811,7 @@ Object.defineProperty(TypeStore.type.time.prototype, 'align', {
 /** @param {{typeName:string, pg_OID?:number, typeDbPg?:string}} param */
 function rangeOf(param){
     var result = function TypeRangeof(){ TypeBase.apply(this, arguments); };
+    result.prototype = Object.create(TypeBase.prototype);
     result.prototype.toPlainString=function toPlainString(typedValue){
         return typedValue;
     };
@@ -820,10 +821,21 @@ function rangeOf(param){
     result.prototype.typeDbPg=param.typeDbPg || param.typeName+'_range';
     if (param.pg_OID) result.prototype.pg_OID=param.pg_OID;
     return result
+    
 }
 
 TypeStore.type.time_range=rangeOf({typeName:'time'});
 TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID:3908});
+
+TypeStore.type.time_range.prototype.isValidTypedData=function isValidTypedData(typedData){
+    //TODO: IMPLEMENTAR
+    return true;
+};
+
+TypeStore.type.tsrange.prototype.isValidTypedData=function isValidTypedData(typedData){
+    //TODO: IMPLEMENTAR
+    return true;
+};
 
 
 // PostgresInterval.prototype.typeStore={type:'interval'};
