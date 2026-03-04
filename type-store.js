@@ -820,22 +820,16 @@ function rangeOf(param){
     };
     result.prototype.typeDbPg=param.typeDbPg || param.typeName+'_range';
     if (param.pg_OID) result.prototype.pg_OID=param.pg_OID;
+
+    result.prototype.isValidTypedData=function isValidTypedData(typedData){
+        return typedData === null || typeof typedData === 'string' && typedData.trim() !== '';
+    };
     return result
     
 }
 
 TypeStore.type.time_range=rangeOf({typeName:'time'});
 TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID:3908});
-
-TypeStore.type.time_range.prototype.isValidTypedData=function isValidTypedData(typedData){
-    //TODO: IMPLEMENTAR
-    return true;
-};
-
-TypeStore.type.tsrange.prototype.isValidTypedData=function isValidTypedData(typedData){
-    //TODO: IMPLEMENTAR
-    return true;
-};
 
 
 // PostgresInterval.prototype.typeStore={type:'interval'};
