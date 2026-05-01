@@ -829,6 +829,7 @@ function rangeOf(param){
 }
 
 TypeStore.type.time_range=rangeOf({typeName:'time'});
+TypeStore.type.time_multirange=rangeOf({typeName:'time', typeDbPg:'time_multirange'});
 TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID:3908});
 
 

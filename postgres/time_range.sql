@@ -3,5 +3,24 @@ CREATE OR REPLACE FUNCTION time_subtype_diff(x time, y time) RETURNS float8 AS
 
 CREATE TYPE time_range AS RANGE (
     subtype = time,
-    subtype_diff = time_subtype_diff
+    subtype_diff = time_subtype_diff,
+    multirange_type_name = time_multirange
 );
+
+CREATE OR REPLACE FUNCTION time_length(mr time_multirange) RETURNS interval
+  LANGUAGE sql IMMUTABLE LEAKPROOF
+AS
+$SQL$
+  SELECT upper(mr) - lower(mr);
+$SQL$;
+
+SELECT expected, time_length(mr) as obtained, mr as "from"
+  FROM (VALUES
+    ('1:00:00'::interval, time_multirange(time_range('08:00', '09:00'))),
+    (null, time_multirange(time_range(null, '09:00'))),
+    ('2:11:00'::interval, time_multirange(time_range('08:00', '09:00'),time_range('10:00', '11:11'))),
+    ('2:11:00'::interval, time_multirange(time_range('08:00', '09:00'),time_range('10:00', '11:11'),time_range('13:00',null))),
+    ('4:11:00'::interval, time_multirange(time_range('04:00', '05:00'),time_range('06:00', '07:00'),time_range('08:00', '09:00'),time_range('10:00', '11:11'))),
+    (null, time_multirange())
+  ) test_cases (expected, mr)
+  WHERE time_length(mr) is distinct from expected
