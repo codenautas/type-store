@@ -8,14 +8,21 @@ CREATE TYPE time_range AS RANGE (
 );
 
 CREATE OR REPLACE FUNCTION duration(mr time_multirange) RETURNS interval
-  LANGUAGE sql IMMUTABLE LEAKPROOF
+  LANGUAGE sql IMMUTABLE
 AS
 $SQL$
   SELECT SUM(upper(r) - lower(r))
   FROM unnest(mr) AS r;
 $SQL$;
 
-SELECT expected, duration(mr) as obtained, mr as "from"
+CREATE OR REPLACE FUNCTION cardinality(mr time_multirange) RETURNS integer
+  LANGUAGE sql IMMUTABLE
+AS
+$SQL$
+  SELECT COUNT(*)::integer FROM unnest(mr);
+$SQL$;
+
+SELECT 'ERROR! in duration!', expected::text, duration(mr)::text as obtained, mr as "from"
   FROM (VALUES
     ('1:00:00'::interval, time_multirange(time_range('08:00', '09:00'))),
     (null, time_multirange(time_range(null, '09:00'))),
@@ -25,3 +32,13 @@ SELECT expected, duration(mr) as obtained, mr as "from"
     (null, time_multirange())
   ) test_cases (expected, mr)
   WHERE duration(mr) is distinct from expected
+UNION
+SELECT 'ERROR! in cardinality!', expected::text, cardinality(mr)::text as obtained, mr as "from"
+  FROM (VALUES
+    (1, time_multirange(time_range('08:00', '09:00'))),
+    (1, time_multirange(time_range(null, '09:00'))),
+    (2, time_multirange(time_range('08:00', '09:00'), time_range('10:00', '11:11'))),
+    (3, time_multirange(time_range('08:00', '09:00'), time_range('10:00', '11:11'), time_range('13:00', null))),
+    (0, time_multirange())
+  ) test_cases (expected, mr)
+  WHERE cardinality(mr) is distinct from expected;
