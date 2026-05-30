@@ -28,7 +28,8 @@
     "istanbul": "^0.4.5",
     "mocha": "^11.7.6",
     "postgres-interval": "^4.0.2",
-    "discrepances": "^0.2.14"
+    "discrepances": "^0.2.14",
+    "qa-control": "^0.6.11"
   },
   "engines": {
     "node": ">= 14"
@@ -41,10 +42,12 @@
     "test-nc": "mocha --reporter spec --bail --check-leaks --no-colors test/"
   },
   "qa-control": {
-    "package-version": "0.3.0",
     "coverage": 90,
     "run-in": "both",
     "stability": "extending",
-    "type": "lib"
+    "type": "lib",
+    "silenced": [
+      "eslint_warnings_in_file_1"
+    ]
   }
 }
