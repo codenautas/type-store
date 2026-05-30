@@ -683,7 +683,7 @@ TypeStore.type.interval.prototype.partDefs=[
     {name:'seconds', optative:false, sufix:''  , twoDigits:true },
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.interval.prototype.regExp=/^(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
+TypeStore.type.interval.prototype.regExp=/^-?(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
     var self = this;
     typeInfo = typeInfo || this.typeInfo;
@@ -704,6 +704,7 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
             interval[partDef.name]=Number(matches[i+1]);
         }
     });
+    if (stringWithInterval[0] == '-') { interval.negative=true; }
     return bestGlobals.timeInterval(interval);
 };
 TypeStore.type.interval.prototype.isValidTypedData=function isValidTypedData(object){

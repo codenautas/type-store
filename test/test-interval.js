@@ -31,6 +31,8 @@ describe("interval", function(){
         {input:'1D 10h' , output:'1D 10:00:00', interval:{days:1, hours:10}},
         {input:'4'      , output:new TypeError('NOT timeInterval')},
         {input:'5'      , output:'0:05:00', interval:{minutes:5}, typeInfo:{timeUnit:'minutes'}},
+        {input:"-3:30"  , output:'-3:30:00', interval:{negative:true, hours:3, minutes:30}},
+        {input:"-2'"    , output:'-0:02:00', interval:{ms:-120000}},
     ].forEach(function(fixture){
         it("accept input \""+fixture.input+"\"", function(){
             try{
