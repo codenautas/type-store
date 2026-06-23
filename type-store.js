@@ -712,6 +712,8 @@ TypeStore.type.interval.prototype.isValidTypedData=function isValidTypedData(obj
     // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
 };
 TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValue){
+    if(this.typeInfo.format == 'hours') return typedValue.toHms();
+    if(this.typeInfo.format == 'hm') return typedValue.toHm();
     return typedValue.toPlainString();
     /*
     var module = TypeStore.type.interval;

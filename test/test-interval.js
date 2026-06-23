@@ -22,20 +22,23 @@ describe("date", function(){
 });
 
 describe("interval", function(){
-    var typer = new TypeStore.type.interval();
     [
         {input:'13:40:00', output:'13:40:00', interval:{hours:13, minutes:40, seconds:0}},
         {input:"3:30"    , output:'3:30:00' , interval:{hours:3, minutes:30}},
         {input:"13h20'"  , output:'13:20:00', interval:{hours:13, minutes:20}},
         {input:'1D'     , output:'1D', interval:{days:1}},
         {input:'1D 10h' , output:'1D 10:00:00', interval:{days:1, hours:10}},
+        {input:'1D 10h' , output:'34:00:00', interval:{days:1, hours:10}, format:'hours'},
+        {input:'1D 10h' , output:'34:00', interval:{days:1, hours:10}, format:'hm'},
         {input:'4'      , output:new TypeError('NOT timeInterval')},
         {input:'5'      , output:'0:05:00', interval:{minutes:5}, typeInfo:{timeUnit:'minutes'}},
         {input:"-3:30"  , output:'-3:30:00', interval:{negative:true, hours:3, minutes:30}},
+        {input:"-03:00" , output:'-3:00:00', interval:{negative:true, hours:3, minutes:0}},
         {input:"-2'"    , output:'-0:02:00', interval:{ms:-120000}},
     ].forEach(function(fixture){
         it("accept input \""+fixture.input+"\"", function(){
             try{
+                var typer = new TypeStore.type.interval({format: fixture.format});
                 var obtainedInterval = typer.fromString(fixture.input, fixture.typeInfo);
                 discrepances.showAndThrow(obtainedInterval, bestGlobals.timeInterval(fixture.interval));
                 if(fixture.typeInfo){
@@ -49,6 +52,10 @@ describe("interval", function(){
                 obtainedOutput=err;
             }
             discrepances.showAndThrow(obtainedOutput, fixture.output);
+            if (typeof fixture.output == 'string') {
+                var reInterval = typer.fromString(fixture.output, fixture.typeInfo);
+                discrepances.showAndThrow(reInterval, bestGlobals.timeInterval(fixture.interval));
+            }
         });
     });
 });
