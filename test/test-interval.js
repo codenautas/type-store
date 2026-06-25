@@ -29,12 +29,14 @@ describe("interval", function(){
         {input:'1D'     , output:'1D', interval:{days:1}},
         {input:'1D 10h' , output:'1D 10:00:00', interval:{days:1, hours:10}},
         {input:'1D 10h' , output:'34:00:00', interval:{days:1, hours:10}, format:'hours'},
-        {input:'1D 10h' , output:'34:00', interval:{days:1, hours:10}, format:'hm'},
+        {input:'1D 10:00:00', output:'34:00', interval:{days:1, hours:10}, format:'hm'},
         {input:'4'      , output:new TypeError('NOT timeInterval')},
         {input:'5'      , output:'0:05:00', interval:{minutes:5}, typeInfo:{timeUnit:'minutes'}},
         {input:"-3:30"  , output:'-3:30:00', interval:{negative:true, hours:3, minutes:30}},
         {input:"-03:00" , output:'-3:00:00', interval:{negative:true, hours:3, minutes:0}},
         {input:"-2'"    , output:'-0:02:00', interval:{ms:-120000}},
+        {input:"1D 03:25:42.857143", output:'1D 3:25:42.857143', interval:{ms:98742857.143}},
+        {input:"1D 03:25:42.857143", output:'27:25', interval:{ms:98742857.143}, format:'hm', outputLoosePrecision:true},
     ].forEach(function(fixture){
         it("accept input \""+fixture.input+"\"", function(){
             try{
@@ -52,7 +54,7 @@ describe("interval", function(){
                 obtainedOutput=err;
             }
             discrepances.showAndThrow(obtainedOutput, fixture.output);
-            if (typeof fixture.output == 'string') {
+            if (typeof fixture.output == 'string' && !fixture.outputLoosePrecision) {
                 var reInterval = typer.fromString(fixture.output, fixture.typeInfo);
                 discrepances.showAndThrow(reInterval, bestGlobals.timeInterval(fixture.interval));
             }

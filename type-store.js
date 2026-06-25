@@ -681,9 +681,10 @@ TypeStore.type.interval.prototype.partDefs=[
     {name:'hours'  , optative:false, sufix:':' },
     {name:'minutes', optative:false, sufix:':' , twoDigits:true },
     {name:'seconds', optative:false, sufix:''  , twoDigits:true },
+    {name:'ms'     , opattive:true , sufix:''  , prefix:'.', decimals: true}
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.interval.prototype.regExp=/^-?(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
+TypeStore.type.interval.prototype.regExp=/^-?(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?(\.\d+)?)?\s*?$/i;
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
     var self = this;
     typeInfo = typeInfo || this.typeInfo;
@@ -701,9 +702,14 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
     var interval={};
     self.partDefs.forEach(function(partDef, i){
         if(matches[i+1]){
-            interval[partDef.name]=Number(matches[i+1]);
+            if (partDef.decimals && matches[i+1]) {
+                interval[partDef.name] = ('0' + matches[i+1]) * 1000;
+            } else {
+                interval[partDef.name] = Number(matches[i+1]);
+            }
         }
     });
+    console.log(interval, matches)
     if (stringWithInterval[0] == '-') { interval.negative=true; }
     return bestGlobals.timeInterval(interval);
 };
