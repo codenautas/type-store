@@ -8,7 +8,6 @@ type ecosystem
 [!--lang:*-->
 
 <!-- cucardas -->
-![extending](https://img.shields.io/badge/stability-extending-orange.svg)
 [![npm-version](https://img.shields.io/npm/v/type-store.svg)](https://npmjs.org/package/type-store)
 [![downloads](https://img.shields.io/npm/dm/type-store.svg)](https://npmjs.org/package/type-store)
 [![build](https://github.com/codenautas/type-store/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/codenautas/type-store/actions/workflows/build-and-test.yml)
@@ -93,7 +92,7 @@ toHtmlText(v)           |*<span class=...>text</span>*|devuelve algo lindo para 
 toPlainJson(v)          |toPlainString  |pasa a un texto que pueda meterse en JSON (salvo para boolean y numeric)
 fromPlainJson(s||n||b)  |               |recibe un valor obtenido de JSON.parse
 **textos locales humanos**|             |por ejemplo 25/5/1810 ó 1.919,44
-toLocalString(v)        |               |devuelve un texto humano 
+toLocalString(v)        |               |devuelve un texto humano
 fromLocalString(s)      |               |obtiene el valor a partir de un texto humano
 isValidLocalString(s)   |               |indica si un texto humano es válido
 *typedControlName*      |               |cómo lo conocemos dentro de typedControls
@@ -107,7 +106,7 @@ toExcelType(v)          |*s*            |el caracter que indica el tipo de la ce
 fromExcelCell(cell)     |               |interpreta una celda de excel
 
 ```sql
-select * 
+select *
   from pg_type
   where oid in (701,1700,23,20,1700,3802,114,1186,1114) or typname like '%time%' or typname like '%range%';
 ```
@@ -123,4 +122,3 @@ select *
 [!--lang:*-->
 
 [MIT](LICENSE)
-

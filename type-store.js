@@ -339,7 +339,7 @@ TypeStore.typeNumber.prototype = Object.create(TypeBase.prototype);
 TypeStore.typeNumber.prototype.typedControlName='number';
 TypeStore.typeNumber.prototype.rejectedChar=function rejectedChar(char, position){
     return (
-        !(/\d/.test(char)) && 
+        !(/\d/.test(char)) &&
         (char!=='.' || this.isInteger) &&
         (char!==TypeStore.locale.number.decimalSeparator || this.isInteger) &&
         (char!=='-' || this.minValue>=0)
@@ -592,10 +592,10 @@ TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
     Ojo con: https://www.npmjs.com/package/xlsx#utility-functions
 
     Epochs: 1900 and 1904 (click to show)
-    Excel supports two epochs (January 1 1900 and January 1 1904), see "1900 vs. 1904 Date System" article. 
+    Excel supports two epochs (January 1 1900 and January 1 1904), see "1900 vs. 1904 Date System" article.
     The workbook's epoch can be determined by examining the workbook's wb.Workbook.WBProps.date1904 property:
 
-    !!(((wb.Workbook||{}).WBProps||{}).date1904)    
+    !!(((wb.Workbook||{}).WBProps||{}).date1904)
 
     */
     return cell.v!=null?bestGlobals.date.ymd(1899,12,31).add({days: cell.v-(cell.v>60?1:0)}):null;
@@ -740,7 +740,7 @@ TypeStore.type.interval.prototype.fromPlainJson=function fromPlainJson(typedValu
         if(typedValue.timeInterval){
             return bestGlobals.timeInterval(typedValue.timeInterval);
         }
-        return bestGlobals.timeInterval(typedValue); 
+        return bestGlobals.timeInterval(typedValue);
     }else{
         return this.fromString(typedValue);
     }
@@ -834,7 +834,7 @@ function rangeOf(param){
         return typedData === null || typeof typedData === 'string' && typedData.trim() !== '';
     };
     return result
-    
+
 }
 
 TypeStore.type.time_range=rangeOf({typeName:'time'});
@@ -845,9 +845,9 @@ TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID
 // PostgresInterval.prototype.typeStore={type:'interval'};
 
 json4all.addType(bestGlobals.TimeInterval,{
-    construct: function construct(value){ 
-        return new bestGlobals.TimeInterval(value); 
-    }, 
+    construct: function construct(value){
+        return new bestGlobals.TimeInterval(value);
+    },
     deconstruct: function deconstruct(o){
         return o.timeInterval;
     },
@@ -855,9 +855,9 @@ json4all.addType(bestGlobals.TimeInterval,{
 
 /*
 json4all.addType(bestGlobals.Datetime,{
-    construct: function construct(value){ 
-        return new bestGlobals.Datetime(value); 
-    }, 
+    construct: function construct(value){
+        return new bestGlobals.Datetime(value);
+    },
     deconstruct: function deconstruct(o){
         return o.parts;
     },
@@ -865,9 +865,9 @@ json4all.addType(bestGlobals.Datetime,{
 */
 
 json4all.addType(Big,{
-    construct: function construct(value){ 
-        return new Big(value); 
-    }, 
+    construct: function construct(value){
+        return new Big(value);
+    },
     deconstruct: function deconstruct(o){
         return o.toString();
     },
@@ -883,9 +883,9 @@ likeAr(TypeStore.type).forEach(function(typer, typeName){
     }
     /*
     json4all.addType(typeName,{
-        construct: function construct(value){ 
-            return new bestGlobals.TimeInterval(value); 
-        }, 
+        construct: function construct(value){
+            return new bestGlobals.TimeInterval(value);
+        },
         deconstruct: function deconstruct(o){
             return o.timeInterval;
         },

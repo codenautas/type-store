@@ -51,7 +51,7 @@ describe("fixtures", function(){
       ]},
       {typeName:'integer', fixtures:[
           {fromString:'-646', value:-646, toHtmlText:"<span class=number number-sign=negative><span class='number-sign'>-</span><span class='number-miles'>646</span></span>"},
-          {fromString:'2147483648', 
+          {fromString:'2147483648',
            fromStringError:new TypeError ('type-store: value out of range')
           }
       ], rejectChars:['.','x',' ']},
@@ -71,14 +71,14 @@ describe("fixtures", function(){
       ], invalidValues:[7 , [7]]},
       {typeName:'jsonb', fixtures:[
           {fromString:'{"a": "b"}', toPlainString:'{"a":"b"}', value:{a:'b'}, local:'{"a":"b"}'},
-          {value:[null, null, 'hi', {a:7, b:false}], 
+          {value:[null, null, 'hi', {a:7, b:false}],
            toHtmlText:"<span class='json-array'><span class='json-array-delimiter'>[</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-string'>&quot;hi&quot;</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'><span class='json-object-delimiter'>{</span><span class='json-object-key'>&quot;a&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-number'>7</span></span><span class='json-object-separator'>,</span><span class='json-object-key'>&quot;b&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-boolean'>false</span></span><span class='json-object-delimiter'>}</span></span></span><span class='json-array-delimiter'>]</span></span>",
            local:"[null,null,\"hi\",{\"a\":7,\"b\":false}]"
           },
       ]},
       {typeName:'jsona', fixtures:[
         {fromString:'{"a": "b"}', toPlainString:'{"a":"b"}', value:{a:'b'}, local:'{"a":"b"}'},
-        {value:[null, null, 'hi', {a:7, b:false}], 
+        {value:[null, null, 'hi', {a:7, b:false}],
          toHtmlText:"<span class='json-array'><span class='json-array-delimiter'>[</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-null'>null</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-string'>&quot;hi&quot;</span></span><span class='json-array-separator'>,</span><span class='json-array-element'><span class='json-object'><span class='json-object-delimiter'>{</span><span class='json-object-key'>&quot;a&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-number'>7</span></span><span class='json-object-separator'>,</span><span class='json-object-key'>&quot;b&quot;</span><span class='json-object-separator'>:</span><span class='json-object-element'><span class='json-boolean'>false</span></span><span class='json-object-delimiter'>}</span></span></span><span class='json-array-delimiter'>]</span></span>",
          local:"[null,null,\"hi\",{\"a\":7,\"b\":false}]"
         },
@@ -96,10 +96,10 @@ describe("fixtures", function(){
       ], typeInfo:{typeName:'interval', timeUnit:'hours'}},
       {typeName:'date', fixtures:[
           {fromString:'2017-12-23', toPlainString:'2017-12-23', value:bestGlobals.date.iso('2017-12-23'), local:'23/12/2017', toHtmlText:"<span class=date current-century><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>12</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>20</span>17</span></span>"},
-          {fromString:currYear+'-'+ZnoCurrMonth+'-23', toPlainString:currYear+'-'+ZnoCurrMonth+'-23', 
-           value:bestGlobals.date.iso(currYear+'-'+noCurrMonth+'-23'), 
-           local:'23/'+noCurrMonth+'/'+currYear, 
-           fromLocal:'23/'+noCurrMonth+'', 
+          {fromString:currYear+'-'+ZnoCurrMonth+'-23', toPlainString:currYear+'-'+ZnoCurrMonth+'-23',
+           value:bestGlobals.date.iso(currYear+'-'+noCurrMonth+'-23'),
+           local:'23/'+noCurrMonth+'/'+currYear,
+           fromLocal:'23/'+noCurrMonth+'',
            toHtmlText:"<span class=date current-century current-year><span class='date-day'>23</span><span class='date-sep'>/</span><span class='date-month'>"+noCurrMonth+"</span><span class='date-sep'>/</span><span class='date-year'><span class='date-century'>"+currYear.substr(0,2)+"</span>"+currYear.substr(2,2)+"</span></span>"
           },
           {fromString:'4'       , fromStringError:new Error('invalid date')},
