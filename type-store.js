@@ -709,7 +709,6 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
             }
         }
     });
-    console.log(interval, matches)
     if (stringWithInterval[0] == '-') { interval.negative=true; }
     return bestGlobals.timeInterval(interval);
 };
