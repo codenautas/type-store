@@ -840,6 +840,39 @@ TypeStore.type.time_range=rangeOf({typeName:'time'});
 TypeStore.type.time_multirange=rangeOf({typeName:'time', typeDbPg:'time_multirange'});
 TypeStore.type.tsrange=rangeOf({typeName:'timestamp', typeDbPg:'tsrange', pg_OID:3908});
 
+TypeStore.type.gpoint = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
+TypeStore.type.gpoint.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.gpoint.prototype.typeDbPg='geography(point,4326)';
+TypeStore.type.gpoint.prototype.pgSpecialParse=true;
+
+TypeStore.type.point = function TypeTimestamp(){ TypeBase.apply(this, arguments); };
+TypeStore.type.point.prototype = Object.create(TypeBase.prototype);
+TypeStore.type.point.prototype.typeDbPg='point';
+TypeStore.type.point.prototype.pg_OID='600';
+TypeStore.type.point.prototype.fromString = function fromString(textValue){
+    return textValue// .slice(1,-1);
+};;
+TypeStore.type.point.prototype.pgSpecialParse=true;
+TypeStore.type.point.prototype.isValidTypedData=function isValidTypedData(typedData){
+    return typedData === null || typeof typedData === 'string' && /^\(?-?\d+(\.\d*),-?\d+(\.\d*)\)?$/.test(typedData);
+};
+TypeStore.type.point.prototype.toPlainString=function toPlainString(typedData){
+    return typedData.slice(1,-1)
+};
+TypeStore.type.point.prototype.toHtml=function toHtml(typedData){
+    var result
+    typedData.replace(/^(\()(-?\d+(?:\.\d*))(,)(-?\d+(?:\.\d*))(\))$/, (_, left, x, comma, y, right) => {
+        result = html.span({class:'point'},[
+            // html.span({class:'left-parenthesis'}, left),
+            html.span({class:'x-coor'}, x),
+            html.span({class:'comma'}, comma),
+            html.span({class:'y-coor'}, y),
+            // html.span({class:'right-parenthesis'}, right),
+        ])
+    });
+    return result;
+};
+
 
 // PostgresInterval.prototype.typeStore={type:'interval'};
 

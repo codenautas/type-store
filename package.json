@@ -27,9 +27,9 @@
     "expect.js": "^0.3.1",
     "istanbul": "^0.4.5",
     "mocha": "^11.7.6",
-    "postgres-interval": "^4.0.2",
+    "postgres-interval": "^4.1.0",
     "discrepances": "^0.2.14",
-    "qa-control": "^0.7.0"
+    "qa-control": "^0.7.5"
   },
   "engines": {
     "node": ">= 14"
