@@ -391,6 +391,11 @@ TypeStore.typeNumber.prototype.fromUserInput=function fromUserInput(textWithUser
         TypeStore.locale.number.decimalSeparator=='.'?textWithUserInput:textWithUserInput.replace(/[.]/,TypeStore.locale.number.decimalSeparator)
     );
 };
+
+TypeStore.typeNumber.prototype.toExcelValue=function toExcelValue(typedValue){
+    return typedValue;
+};
+
 TypeStore.typeNumber.prototype.toExcelType=function toExcelType(typedValue){
     return 'n';
 };
@@ -531,6 +536,17 @@ TypeStore.type.jsonb.prototype.isValidTypedData=function isValidTypedData(object
 };
 TypeStore.type.jsonb.prototype.toPlainString=function toPlainString(typedValue){
     return JSON.stringify(typedValue);
+};
+
+TypeStore.type.jsonb.prototype.toExcelValue = function toExcelValue(typedValue) {
+    var str = typeof typedValue === 'object' ? JSON.stringify(typedValue) : String(typedValue);
+    // 1. Limpiar caracteres de control ASCII invisibles que corrompen el XML de Excel
+    str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+    // 2. Si el JSON supera el límite de celda de Excel (32,767 caracteres), truncar
+    if (str.length > 32000) {
+        str = str.substring(0, 32000);
+    }
+    return str;
 };
 TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     var innerPart;
