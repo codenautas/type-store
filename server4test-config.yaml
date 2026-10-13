@@ -1,0 +1,16 @@
+server4test:
+  verbose: false
+  browser-test:
+    files:
+      - node_modules/require-bro/lib/require-bro.js
+      - server4test-browser-assert.js
+      - node_modules/best-globals/best-globals.js
+      - node_modules/big.js/big.js
+      - node_modules/like-ar/like-ar.js
+      - node_modules/json4all/json4all.js
+      - node_modules/js-to-html/lib/js-to-html.js
+      - node_modules/discrepances/lib/discrepances.js
+      - local-instrumented/type-store.js
+      - test/test-bigint.js
+      - test/test-fixtures.js
+      - test/test-interval.js

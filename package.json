@@ -14,22 +14,25 @@
   "overrides": {
     "diff": "^8.0.2",
     "serialize-javascript": "^7.0.0",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^4.1.0"
+    }
   },
   "dependencies": {
     "big.js": "^7.0.1",
-    "best-globals": "^2.2.2",
-    "js-to-html": "^1.4.0",
-    "json4all": "^1.4.5",
+    "best-globals": "^2.2.3",
+    "js-to-html": "^1.5.0",
+    "json4all": "^1.4.6",
     "like-ar": "^0.5.4"
   },
   "devDependencies": {
-    "expect.js": "^0.3.1",
     "nyc": "^18.0.0",
     "mocha": "^12.0.3",
-    "postgres-interval": "^4.1.0",
-    "discrepances": "^0.2.14",
-    "qa-control": "^0.12.1"
+    "discrepances": "^0.3.1",
+    "qa-control": "^0.12.2",
+    "require-bro": "^0.4.1",
+    "server4test": "^2.0.0"
   },
   "engines": {
     "node": ">= 14"
@@ -37,14 +40,17 @@
   "scripts": {
     "start": "node example/server.js",
     "test": "mocha --reporter spec --bail --check-leaks test/",
-    "test-ci": "nyc --reporter=lcovonly mocha --reporter spec --check-leaks test/",
+    "test-ci": "nyc --silent mocha --reporter spec --check-leaks test/ && npm run test-navigator && nyc report --reporter=lcovonly --reporter=text-summary",
     "test-cov": "nyc mocha --reporter dot --check-leaks test/",
-    "test-nc": "mocha --reporter spec --bail --check-leaks --no-colors test/"
+    "test-nc": "mocha --reporter spec --bail --check-leaks --no-colors test/",
+    "build-test": "nyc instrument --delete type-store.js local-instrumented",
+    "test-navigator": "npm run build-test && server4test --run-browser chrome,firefox",
+    "test-navigator-inf": "npm run build-test && server4test"
   },
   "qa-control": {
+    "gha": "all",
     "coverage": 90,
     "run-in": "both",
-    "stability": "extending",
     "type": "lib",
     "silenced": [
       "eslint_warnings_in_file_1"
