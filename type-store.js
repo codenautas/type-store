@@ -471,7 +471,7 @@ TypeStore.type.integer.prototype.pg_OID=23;
 
 TypeStore.type.bigint=function TypeBigint(){ TypeStore.type.hugeint.apply(this,arguments); };
 TypeStore.type.bigint.prototype=Object.create(TypeStore.type.hugeint.prototype);
-TypeStore.type.bigint.prototype.maxValue= 9_223_372_036_854_775_807;
+TypeStore.type.bigint.prototype.maxValue= 9_223_372_036_854_775_807; // eslint-disable-line no-loss-of-precision -- the maximum of a bigint; as a Number it rounds to 2^63
 TypeStore.type.bigint.prototype.minValue= -9_223_372_036_854_775_808;
 TypeStore.type.bigint.prototype.typeDbPg='bigint';
 TypeStore.type.bigint.prototype.pg_OID=20;

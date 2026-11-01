@@ -13,6 +13,7 @@ module.exports = [
         files: ["type-store.js", "postgres-interval4client.js"],
         plugins: { sonarjs, unicorn },
         rules: {
+            "no-loss-of-precision": 2,
             "sonarjs/no-nested-conditional": 2,
             "sonarjs/regex-complexity": 2,
             "unicorn/consistent-function-scoping": 2,
