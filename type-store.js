@@ -107,7 +107,7 @@ TypeStore.class.Big.prototype.toLiteral=function(){
     return this.toString();
 };
 
-function TypeBase(typeInfo){
+function TypeBase(typeInfo){ // eslint-disable-line unicorn/consistent-function-scoping
     this.typeInfo=typeInfo||{};
     this.typeInfo.typeName=this.typeInfo.typeName||this.typeName;
 }
@@ -123,7 +123,6 @@ TypeBase.prototype.toHtmlText = function toHtmlText(value){
     return this.toHtml(value).toHtmlText();
 };
 TypeBase.prototype.toHtml=function toHtml(typedValue){
-    var typer=this;
     if(this.toLocalParts){
         return this.toLocalParts(
             typedValue,
@@ -210,6 +209,7 @@ TypeBase.prototype.isValidLocalString=function isValidLocalString(textWithLocalV
         this.validateTypedData(typedValue);
         return true;
     }catch(err){
+        // an invalid local string is reported as false, not as an error
         return false;
     }
 };
@@ -275,7 +275,7 @@ TypeStore.type.text.postInputs={
             .replace(/[íÍìÌ]/g,'I')
             .replace(/[óÓòÒ]/g,'O')
             .replace(/[úÚùÙüÜ]/g,'U')
-            .replace(/[ñ]/g,'Ñ')
+            .replace(/ñ/g,'Ñ')
             .replace(/[^A-Z0-9_]/g,'_');
     },
     upperSpanish:function upperSpanish(textWithValue){
@@ -285,12 +285,13 @@ TypeStore.type.text.postInputs={
         var typeDecimal = TypeStore.typerFrom({typeName:'decimal'});
         try{
             var value = typeDecimal.fromString(textWithValue);
-            if(isNaN(value)){
+            if(Number.isNaN(value)){
                 throw new Error('NaN value');
             }else{
                 return value.toString();
             }
         }catch(err){
+            // a text that is not a decimal number is converted to null
             return null
         }
     }
@@ -361,14 +362,13 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
     var str = this.toPlainString(typedValue);
     var rta = [];
     str.replace(/^([-+]?[0-9 ]+)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
-        left.replace(/^([-+]?)([0-9][0-9]?[0-9]?)(([0-9][0-9][0-9])*)$/, function(str, sign, prefix, triplets){
+        left.replace(/^([-+]?)(\d\d?\d?)((\d\d\d)*)$/, function(str, sign, prefix, triplets){
             if (sign === '-') {
                 rta.push(fPart(sign,"number-sign"));
             }
             rta.push(fPart(prefix,"number-miles"));
-            triplets.replace(/[0-9][0-9][0-9]/g,function(triplet,a,b,c){
-                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator",true));
-                rta.push(fPart(triplet,"number-miles"));
+            triplets.replace(/\d\d\d/g,function(triplet,a,b,c){
+                rta.push(fPart(TypeStore.locale.number.milesSeparator,"number-separator",true), fPart(triplet,"number-miles"));
             });
         });
         if(dot){
@@ -378,7 +378,7 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
             rta.push(fPart(decimals,"number-decimals"));
         }
     });
-    return fParts(rta, "number", {"number-sign":typedValue>0?"positive":typedValue<0?"negative":"zero"});
+    return fParts(rta, "number", {"number-sign":typedValue>0?"positive":typedValue<0?"negative":"zero"}); // eslint-disable-line sonarjs/no-nested-conditional
 };
 TypeStore.typeNumber.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData==null || typeof typedData === 'number' || typedData instanceof Big;
@@ -411,7 +411,7 @@ TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.double.prototype.typeDbPg='double precision';
 TypeStore.type.double.prototype.fromString=function fromString(textWithNumber){
     var answer = Number(textWithNumber);
-    if(isNaN(answer) && typeof textWithNumber === "string" && /^\s*\d+,\d+\s*$/.test(textWithNumber)){
+    if(Number.isNaN(answer) && typeof textWithNumber === "string" && /^\s*\d+,\d+\s*$/.test(textWithNumber)){
         return Number(textWithNumber.replace(',','.'));
     }else{
         return answer;
@@ -427,7 +427,7 @@ TypeStore.type.hugeint.prototype.typeDbPg='numeric(1000)';
 TypeStore.type.hugeint.prototype.pgSpecialParse=true;
 // TypeStore.type.hugeint.prototype.pg_OID:1700,
 TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt){
-    var self = this;
+    var self = this; // eslint-disable-line unicorn/no-this-assignment
     if(textWithHugeInt == null){
         return null;
     }
@@ -471,8 +471,8 @@ TypeStore.type.integer.prototype.pg_OID=23;
 
 TypeStore.type.bigint=function TypeBigint(){ TypeStore.type.hugeint.apply(this,arguments); };
 TypeStore.type.bigint.prototype=Object.create(TypeStore.type.hugeint.prototype);
-TypeStore.type.bigint.prototype.maxValue= 9223372036854775807;
-TypeStore.type.bigint.prototype.minValue= -9223372036854775808;
+TypeStore.type.bigint.prototype.maxValue= 9_223_372_036_854_775_807;
+TypeStore.type.bigint.prototype.minValue= -9_223_372_036_854_775_808;
 TypeStore.type.bigint.prototype.typeDbPg='bigint';
 TypeStore.type.bigint.prototype.pg_OID=20;
 
@@ -484,9 +484,9 @@ TypeStore.type.decimal.prototype.typedControlName='number';
 TypeStore.type.decimal.prototype.pgSpecialParse=true;
 TypeStore.type.decimal.prototype.pg_OID=1700;
 TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
-    var self = this;
+    var self = this; // eslint-disable-line unicorn/no-this-assignment
     var number = Number(textWithValue);
-    if (isNaN(number) && typeof textWithValue === "string") {
+    if (Number.isNaN(number) && typeof textWithValue === "string") {
         textWithValue = textWithValue.replace(',','.');
         number = Number(textWithValue);
     }
@@ -500,7 +500,7 @@ TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
     return number;
 };
 TypeStore.type.decimal.prototype.fromExcelCell=function fromExcelCell(cell){
-    return cell.v!=null?(cell.t === 'n')?this.fromString(cell.v):cell.v.replace(/,/g, '.'):null;
+    return cell.v!=null?(cell.t === 'n')?this.fromString(cell.v):cell.v.replace(/,/g, '.'):null; // eslint-disable-line sonarjs/no-nested-conditional
 };
 TypeStore.type["ARRAY:text"] = function TypeArrayText(){ TypeBase.apply(this, arguments); };
 TypeStore.type["ARRAY:text"].prototype = Object.create(TypeBase.prototype);
@@ -510,7 +510,7 @@ TypeStore.type["ARRAY:text"].prototype.isValidTypedData=function isValidTypedDat
 };
 TypeStore.type["ARRAY:text"].prototype.whyTypedDataIsInvalid=function whyTypedDataIsInvalid(anyValue){
     if(anyValue!=null){
-        if(!(anyValue instanceof Array)){
+        if(!Array.isArray(anyValue)){
             return "Non an Array in type-store ARRAY:text";
         }else{
             return anyValue.reduce(function(accum, anyElement, i){
@@ -528,7 +528,7 @@ TypeStore.type["ARRAY:text"].prototype.whyTypedDataIsInvalid=function whyTypedDa
     return null;
 };
 TypeStore.type["ARRAY:text"].prototype.fromString=function fromString(stringWithArrayText){
-    return stringWithArrayText.split(/\s*;\s*/g).map(function(text){ return text.trim(); });
+    return stringWithArrayText.split(';').map(function(text){ return text.trim(); });
 };
 TypeStore.type["ARRAY:text"].prototype.toPlainString=function toPlainString(typedValue){
     return typedValue.join(';');
@@ -571,8 +571,8 @@ TypeStore.type.jsonb.prototype.toExcelValue = function toExcelValue(typedValue) 
 };
 TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
     var innerPart;
-    var self=this;
-    if(typedValue instanceof Array){
+    var self=this; // eslint-disable-line unicorn/no-this-assignment
+    if(Array.isArray(typedValue)){
         innerPart=[html.span({class:'json-array-delimiter'},'[')];
         typedValue.forEach(function(element,i){
             if(i){
@@ -589,9 +589,11 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
             if(i++){
                 innerPart.push(html.span({class:'json-object-separator'},','));
             }
-            innerPart.push(html.span({class:'json-object-key'},JSON.stringify(key)));
-            innerPart.push(html.span({class:'json-object-separator'},':'));
-            innerPart.push(html.span({class:'json-object-element'},self.toHtml(element)));
+            innerPart.push(
+                html.span({class:'json-object-key'},JSON.stringify(key)),
+                html.span({class:'json-object-separator'},':'),
+                html.span({class:'json-object-element'},self.toHtml(element))
+            );
         });
         innerPart.push(html.span({class:'json-object-delimiter'},'}'));
         return html.span({class:'json-object'},innerPart);
@@ -614,7 +616,7 @@ TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
 TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
-    if (cell.v && cell.t === 's' && isNaN(cell.v)) {
+    if (cell.v && cell.t === 's' && isNaN(cell.v)) { // eslint-disable-line unicorn/prefer-number-properties -- the text is converted to a number on purpose
         try{
             if(/^\d{3,}-\d{1,2}-\d{1,2}$/.test(cell.v)){
                 return bestGlobals.date.iso(cell.v);
@@ -721,11 +723,11 @@ TypeStore.type.interval.prototype.partDefs=[
     {name:'ms'     , opattive:true , sufix:''  , prefix:'.', decimals: true}
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.interval.prototype.regExp=/^-?\s*(?:(\d+)(?!\d)\s*(?:y|years?|años?|ann?i?os?)\s*)?(?:(\d+)(?!\d)\s*(?:m|months?|mese?s?)\s*)?(?:(\d+)(?!\d)\s*(?:d|days?|días?|dias?)\s*)?(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?(?:\s*(\.\d+))?\s*)?$/i;
+TypeStore.type.interval.prototype.regExp=/^-?\s*(?:(\d+)(?!\d)\s*(?:y|years?|años?|ann?i?os?)\s*)?(?:(\d+)(?!\d)\s*(?:m|months?|mese?s?)\s*)?(?:(\d+)(?!\d)\s*(?:d|days?|días?|dias?)\s*)?(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?(?:\s*(\.\d+))?\s*)?$/i; // eslint-disable-line sonarjs/regex-complexity -- every part of the format is optional; it is linear because a number never splits
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
-    var self = this;
+    var self = this; // eslint-disable-line unicorn/no-this-assignment
     typeInfo = typeInfo || this.typeInfo;
-    if(!isNaN(stringWithInterval)){
+    if(!isNaN(stringWithInterval)){ // eslint-disable-line unicorn/prefer-number-properties -- the text is converted to a number on purpose
         if(!typeInfo.timeUnit){
             throw new TypeError('NOT timeInterval');
         }
@@ -821,7 +823,7 @@ TypeStore.type.time.prototype.partDefs=[
     {name:'seconds', optative:false, sufix:''  , twoDigits:true },
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.time.prototype.regExp=/^\s*(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?\s*)?$/i;
+TypeStore.type.time.prototype.regExp=/^\s*(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?\s*)?$/i; // eslint-disable-line sonarjs/regex-complexity -- every part of the format is optional; it is linear because a number never splits
 TypeStore.type.time.prototype.fromString=function fromString(stringWithTime){
     var value = this.toLocalString(stringWithTime);
     if (value.length <1 ) throw new TypeError("NOT time")
@@ -833,13 +835,10 @@ TypeStore.type.time.prototype.isValidTypedData=function isValidTypedData(object)
 TypeStore.type.time.prototype.toLocalParts=function toLocalParts(typedValue,fPart,fParts){
     var str = this.toPlainString(typedValue);
     var rta = [];
-    str.replace(/^\s*0?([1-2]?\d)\:(\d\d)(\:(\d\d))?$/, function(str, hour, minutes, dot, seconds){
-        rta.push(fPart(hour,"time-hour"));
-        rta.push(fPart(':',"time-colon"));
-        rta.push(fPart(minutes,"time-min"));
+    str.replace(/^\s*0?([1-2]?\d):(\d\d)(:(\d\d))?$/, function(str, hour, minutes, dot, seconds){
+        rta.push(fPart(hour,"time-hour"), fPart(':',"time-colon"), fPart(minutes,"time-min"));
         if (seconds !== '00' && seconds != null) {
-            rta.push(fPart(':',"time-colon"));
-            rta.push(fPart(seconds,"time-sec"));
+            rta.push(fPart(':',"time-colon"), fPart(seconds,"time-sec"));
         }
     });
     return fParts(rta, "time");

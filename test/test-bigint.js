@@ -126,7 +126,7 @@ describe("integer types accept only decimal integers", function(){
     it("integer: an integer is valid typed data", testValidTypedData("integer", 5, true));
     it("integer: null is valid typed data", testValidTypedData("integer", null, true));
     it("integer: a number with decimals is not valid typed data", testValidTypedData("integer", 1.5, false));
-    it("integer: NaN is not valid typed data", testValidTypedData("integer", NaN, false));
+    it("integer: NaN is not valid typed data", testValidTypedData("integer", Number.NaN, false));
     it("hugeint: a big integer is valid typed data", testValidTypedData("hugeint", new Big("1234567890123450"), true));
     it("hugeint: a big number with decimals is not valid typed data", testValidTypedData("hugeint", new Big("1234567890123450.5"), false));
 });

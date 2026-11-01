@@ -20,7 +20,9 @@
 })(/*jshint -W040 */this, 'PostgresInterval', function() {
 /*jshint +W040 */
 
-function PostgresInterval(){}
+function PostgresInterval(){ // eslint-disable-line unicorn/consistent-function-scoping
+    // empty: in the client it only gives the class (constructor) of the intervals
+}
 
 PostgresInterval["4client"]=true;
 
