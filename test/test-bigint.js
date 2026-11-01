@@ -78,3 +78,55 @@ describe("text", function(){
         discrepances.showAndThrow(typer.align, 'left');
     });
 });
+
+describe("integer types accept only decimal integers", function(){
+    var invalidInteger = "type-store: invalid integer";
+    function testFromString(typeName, input, expected){
+        return function(){
+            var typer = new TypeStore.type[typeName]();
+            if(expected instanceof Error){
+                assert.throws(function(){ typer.fromString(input); }, function(err){
+                    return err instanceof TypeError && err.message === expected.message;
+                });
+            }else{
+                assert.strictEqual(typer.fromString(input), expected);
+            }
+        };
+    }
+    function testValidTypedData(typeName, typedData, expected){
+        return function(){
+            assert.strictEqual(new TypeStore.type[typeName]().isValidTypedData(typedData), expected);
+        };
+    }
+    it("integer: accepts digits", testFromString("integer", "123", 123));
+    it("integer: accepts a sign", testFromString("integer", "-45", -45));
+    it("integer: accepts a plus sign", testFromString("integer", "+5", 5));
+    it("integer: accepts spaces around", testFromString("integer", " 12 ", 12));
+    it("integer: accepts an integer number", testFromString("integer", 7, 7));
+    it("integer: an empty text is null", testFromString("integer", "", null));
+    it("integer: a text with only spaces is null", testFromString("integer", "  ", null));
+    it("integer: null is null", testFromString("integer", null, null));
+    it("integer: rejects letters", testFromString("integer", "abc", new TypeError(invalidInteger)));
+    it("integer: rejects decimals", testFromString("integer", "1.5", new TypeError(invalidInteger)));
+    it("integer: rejects a number with decimals", testFromString("integer", 1.5, new TypeError(invalidInteger)));
+    it("integer: rejects hexadecimal", testFromString("integer", "0x10", new TypeError(invalidInteger)));
+    it("integer: rejects exponents", testFromString("integer", "1e3", new TypeError(invalidInteger)));
+    it("integer: rejects spaces inside", testFromString("integer", "1 2", new TypeError(invalidInteger)));
+    it("bigint: rejects letters", testFromString("bigint", "abc", new TypeError(invalidInteger)));
+    it("bigint: rejects decimals", testFromString("bigint", "1.5", new TypeError(invalidInteger)));
+    it("bigint: an empty text is null", testFromString("bigint", "", null));
+    it("hugeint: rejects letters", testFromString("hugeint", "abc", new TypeError(invalidInteger)));
+    it("hugeint: rejects decimals", testFromString("hugeint", "1.5", new TypeError(invalidInteger)));
+    it("hugeint: an empty text is null", testFromString("hugeint", "", null));
+    it("hugeint: converts a big integer with a plus sign and spaces", function(){
+        var n = new TypeStore.type.hugeint().fromString(" +1234567890123450 ");
+        assert(n instanceof Big);
+        assert.equal(n.toString(), "1234567890123450");
+    });
+    it("integer: an integer is valid typed data", testValidTypedData("integer", 5, true));
+    it("integer: null is valid typed data", testValidTypedData("integer", null, true));
+    it("integer: a number with decimals is not valid typed data", testValidTypedData("integer", 1.5, false));
+    it("integer: NaN is not valid typed data", testValidTypedData("integer", NaN, false));
+    it("hugeint: a big integer is valid typed data", testValidTypedData("hugeint", new Big("1234567890123450"), true));
+    it("hugeint: a big number with decimals is not valid typed data", testValidTypedData("hugeint", new Big("1234567890123450.5"), false));
+});

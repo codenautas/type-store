@@ -37,6 +37,10 @@ describe("interval", function(){
         {input:"-2'"    , output:'-0:02:00', interval:{ms:-120000}},
         {input:"1D 03:25:42.857143", output:'1D 3:25:42.857143', interval:{ms:98742857.143}},
         {input:"1D 03:25:42.857143", output:'27:25', interval:{ms:98742857.143}, format:'hm', outputLoosePrecision:true},
+        {input:"45 seg" , output:'0:00:45', interval:{seconds:45}},
+        {input:"12s"    , output:'0:00:12', interval:{seconds:12}},
+        {input:"90s"    , output:'0:01:30', interval:{seconds:90}},
+        {input:"123 sec", output:'0:02:03', interval:{seconds:123}},
     ].forEach(function(fixture){
         it("accept input \""+fixture.input+"\"", function(){
             try{
@@ -54,7 +58,7 @@ describe("interval", function(){
                 obtainedOutput=err;
             }
             discrepances.showAndThrow(obtainedOutput, fixture.output);
-            if (typeof fixture.output == 'string' && !fixture.outputLoosePrecision) {
+            if (typeof fixture.output === 'string' && !fixture.outputLoosePrecision) {
                 var reInterval = typer.fromString(fixture.output, fixture.typeInfo);
                 discrepances.showAndThrow(reInterval, bestGlobals.timeInterval(fixture.interval));
             }
@@ -69,7 +73,7 @@ describe("time", function(){
         {input:"05:30"   , output:'5:30' , interval:'5:30' },
         {input:'4'       , output:new TypeError('NOT time')},
     ].forEach(function(fixture){
-        function toTime(x){ return x};
+        function toTime(x){ return x}
         it("accept input \""+fixture.input+"\"", function(){
             try{
                 var obtainedTime = typer.fromString(fixture.input, fixture.typeInfo);
@@ -87,4 +91,24 @@ describe("time", function(){
             discrepances.showAndThrow(obtainedOutput, fixture.output);
         });
     });
+});
+
+describe("interval and time reject long invalid texts quickly (without catastrophic backtracking)", function(){
+    function testRejectsQuickly(isValid, text){
+        return function(){
+            var start=Date.now();
+            assert.strictEqual(isValid(text), false);
+            assert.ok(Date.now()-start < 100, "it took "+(Date.now()-start)+"ms");
+        };
+    }
+    var intervalTyper = new TypeStore.type.interval({});
+    function isValidInterval(text){ return intervalTyper.fromString(text, {}) !== null; }
+    var timeTyper = new TypeStore.type.time();
+    function isValidTime(text){ return timeTyper.isValidTypedData(text); }
+    it("interval: spaces followed by an invalid character", testRejectsQuickly(isValidInterval, " ".repeat(50000)+"x"));
+    it("interval: digits followed by an invalid character", testRejectsQuickly(isValidInterval, "1".repeat(50000)+"x"));
+    it("interval: a number, spaces and an invalid character", testRejectsQuickly(isValidInterval, "1"+" ".repeat(50000)+"x"));
+    it("time: spaces followed by an invalid character", testRejectsQuickly(isValidTime, " ".repeat(50000)+"x"));
+    it("time: digits followed by an invalid character", testRejectsQuickly(isValidTime, "1".repeat(50000)+"x"));
+    it("time: a number, spaces and an invalid character", testRejectsQuickly(isValidTime, "1"+" ".repeat(50000)+"x"));
 });

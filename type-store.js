@@ -17,19 +17,19 @@
         root[root.globalModuleName] = factory();
     }
     root.globalModuleName = null;
-})(/*jshint -W040 */this, 'TypeStore', function() {
+})(/*jshint -W040 */this, 'TypeStore', function() { // eslint-disable-line max-statements
 /*jshint +W040 */
 
 /*jshint -W004 */
 var TypeStore = {};
 /*jshint +W004 */
 
-var likeAr = require('like-ar');
-var bestGlobals = require('best-globals');
+var likeAr = require('like-ar');  // eslint-disable-line global-require
+var bestGlobals = require('best-globals');  // eslint-disable-line global-require
 var changing = bestGlobals.changing;
-var Big = require('big.js');
-var json4all=require('json4all');
-var jsToHtml = require('js-to-html');
+var Big = require('big.js');  // eslint-disable-line global-require
+var json4all=require('json4all');  // eslint-disable-line global-require
+var jsToHtml = require('js-to-html');  // eslint-disable-line global-require
 var html = jsToHtml.html;
 
 TypeStore.type={};
@@ -89,7 +89,7 @@ Big.prototype.sameValue=function(other){
     if(typeof other === 'number'){
         other = new TypeStore.class.Big(other);
     }
-    return other instanceof Big && this.toString() == other.toString();
+    return other instanceof Big && this.toString() === other.toString();
 };
 
 Big.prototype.toSqlString = function toSqlString(){
@@ -362,7 +362,7 @@ TypeStore.typeNumber.prototype.toLocalParts=function toLocalParts(typedValue,fPa
     var rta = [];
     str.replace(/^([-+]?[0-9 ]+)((\.)([0-9 ]*))?$/, function(str, left, dotPart, dot, decimals){
         left.replace(/^([-+]?)([0-9][0-9]?[0-9]?)(([0-9][0-9][0-9])*)$/, function(str, sign, prefix, triplets){
-            if(sign=='-'){
+            if (sign === '-') {
                 rta.push(fPart(sign,"number-sign"));
             }
             rta.push(fPart(prefix,"number-miles"));
@@ -388,7 +388,7 @@ TypeStore.typeNumber.prototype.fromLocalString=function fromLocalString(textWith
 };
 TypeStore.typeNumber.prototype.fromUserInput=function fromUserInput(textWithUserInput){
     return this.fromString(
-        TypeStore.locale.number.decimalSeparator=='.'?textWithUserInput:textWithUserInput.replace(/[.]/,TypeStore.locale.number.decimalSeparator)
+        TypeStore.locale.number.decimalSeparator === '.' ? textWithUserInput:textWithUserInput.replace(/[.]/,TypeStore.locale.number.decimalSeparator)
     );
 };
 
@@ -411,7 +411,7 @@ TypeStore.type.double.prototype=Object.create(TypeStore.typeNumber.prototype);
 TypeStore.type.double.prototype.typeDbPg='double precision';
 TypeStore.type.double.prototype.fromString=function fromString(textWithNumber){
     var answer = Number(textWithNumber);
-    if(isNaN(answer) && typeof textWithNumber == "string" && /^\s*\d+,\d+\s*$/.test(textWithNumber)){
+    if(isNaN(answer) && typeof textWithNumber === "string" && /^\s*\d+,\d+\s*$/.test(textWithNumber)){
         return Number(textWithNumber.replace(',','.'));
     }else{
         return answer;
@@ -428,15 +428,36 @@ TypeStore.type.hugeint.prototype.pgSpecialParse=true;
 // TypeStore.type.hugeint.prototype.pg_OID:1700,
 TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt){
     var self = this;
-    var number = Number(textWithHugeInt);
+    if(textWithHugeInt == null){
+        return null;
+    }
+    if(typeof textWithHugeInt === 'number'){
+        if(!Number.isInteger(textWithHugeInt)){
+            throw new TypeError("type-store: invalid integer");
+        }
+        textWithHugeInt = String(textWithHugeInt);
+    }
+    var text = String(textWithHugeInt).trim();
+    if(text === ''){
+        return null;
+    }
+    // only an optional sign and decimal digits: Number() would also accept "1.5", "0x10" or "1e3"
+    if(!/^[-+]?\d+$/.test(text)){
+        throw new TypeError("type-store: invalid integer");
+    }
+    text = text.replace(/^\+/, '');
+    var number = Number(text);
     if('maxValue' in self && number>self.maxValue || 'minValue' in self && number<self.minValue){
         throw new TypeError("type-store: value out of range");
     }
     if(number<self.minBig || number>self.maxBig){
-        number = new TypeStore.class.Big(textWithHugeInt, self.typeName);
+        number = new TypeStore.class.Big(text, self.typeName);
     }
     self.setTypeInfo(number);
     return number;
+};
+TypeStore.type.hugeint.prototype.isValidTypedData=function isValidTypedData(typedData){
+    return typedData==null || Number.isInteger(typedData) || typedData instanceof Big && typedData.round().eq(typedData);
 };
 TypeStore.type.hugeint.prototype.toPlainJson=TypeBase.prototype.toPlainJson;
 TypeStore.type.hugeint.prototype.fromPlainJson=TypeBase.prototype.fromPlainJson;
@@ -465,7 +486,7 @@ TypeStore.type.decimal.prototype.pg_OID=1700;
 TypeStore.type.decimal.prototype.fromString= function fromString(textWithValue){
     var self = this;
     var number = Number(textWithValue);
-    if(isNaN(number) && typeof textWithValue == "string"){
+    if (isNaN(number) && typeof textWithValue === "string") {
         textWithValue = textWithValue.replace(',','.');
         number = Number(textWithValue);
     }
@@ -541,7 +562,7 @@ TypeStore.type.jsonb.prototype.toPlainString=function toPlainString(typedValue){
 TypeStore.type.jsonb.prototype.toExcelValue = function toExcelValue(typedValue) {
     var str = typeof typedValue === 'object' ? JSON.stringify(typedValue) : String(typedValue);
     // 1. Limpiar caracteres de control ASCII invisibles que corrompen el XML de Excel
-    str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+    str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');  // eslint-disable-line no-control-regex
     // 2. Si el JSON supera el límite de celda de Excel (32,767 caracteres), truncar
     if (str.length > 32000) {
         str = str.substring(0, 32000);
@@ -593,7 +614,7 @@ TypeStore.type.date.prototype.fromString=function fromString(text){
     return bestGlobals.date.iso(text);
 };
 TypeStore.type.date.prototype.fromExcelCell=function fromExcelCell(cell){
-    if(cell.v && cell.t=='s' && isNaN(cell.v)){
+    if (cell.v && cell.t === 's' && isNaN(cell.v)) {
         try{
             if(/^\d{3,}-\d{1,2}-\d{1,2}$/.test(cell.v)){
                 return bestGlobals.date.iso(cell.v);
@@ -644,14 +665,14 @@ TypeStore.type.date.prototype.toLocalParts=function toLocalParts(typedValue, fPa
     var attrs = {};
     var today = bestGlobals.date.today();
     var partData={day:typedValue.getDate(),month:typedValue.getMonth()+1,year:typedValue.getFullYear()};
-    if(Math.floor(today.getFullYear()/100)==Math.floor(typedValue.getFullYear()/100)){
+    if (Math.floor(today.getFullYear()/100) === Math.floor(typedValue.getFullYear()/100)) {
         attrs["current-century"]=true;
     }
-    if(today.getFullYear()==typedValue.getFullYear()){
+    if (today.getFullYear() === typedValue.getFullYear()) {
         attrs["current-year"]=true;
-        if(today.getMonth()==typedValue.getMonth()){
+        if (today.getMonth() === typedValue.getMonth()) {
             attrs["current-month"]=true;
-            if(today.getDate()==typedValue.getDate()){
+            if (today.getDate() === typedValue.getDate()) {
                 attrs["current-day"]=true;
             }
         }
@@ -700,7 +721,7 @@ TypeStore.type.interval.prototype.partDefs=[
     {name:'ms'     , opattive:true , sufix:''  , prefix:'.', decimals: true}
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.interval.prototype.regExp=/^-?(?:(\d+)\s*(?:y|years?|años?|ann?i?os?))?\s*(?:(\d+)\s*(?:m|months?|mese?s?))?\s*(?:(\d+)\s*(?:d|days?|días?|dias?))?\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?(\.\d+)?)?\s*?$/i;
+TypeStore.type.interval.prototype.regExp=/^-?\s*(?:(\d+)(?!\d)\s*(?:y|years?|años?|ann?i?os?)\s*)?(?:(\d+)(?!\d)\s*(?:m|months?|mese?s?)\s*)?(?:(\d+)(?!\d)\s*(?:d|days?|días?|dias?)\s*)?(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?(?:\s*(\.\d+))?\s*)?$/i;
 TypeStore.type.interval.prototype.fromString=function fromString(stringWithInterval, typeInfo){
     var self = this;
     typeInfo = typeInfo || this.typeInfo;
@@ -725,7 +746,7 @@ TypeStore.type.interval.prototype.fromString=function fromString(stringWithInter
             }
         }
     });
-    if (stringWithInterval[0] == '-') { interval.negative=true; }
+    if (stringWithInterval[0] === '-') { interval.negative=true; }
     return bestGlobals.timeInterval(interval);
 };
 TypeStore.type.interval.prototype.isValidTypedData=function isValidTypedData(object){
@@ -733,8 +754,8 @@ TypeStore.type.interval.prototype.isValidTypedData=function isValidTypedData(obj
     // return object===null || object instanceof TypeStore.type.interval.constructorFunction;
 };
 TypeStore.type.interval.prototype.toPlainString=function toPlainString(typedValue){
-    if(this.typeInfo.format == 'hours') return typedValue.toHms();
-    if(this.typeInfo.format == 'hm') return typedValue.toHm();
+    if(this.typeInfo.format === 'hours') return typedValue.toHms();
+    if(this.typeInfo.format === 'hm') return typedValue.toHm();
     return typedValue.toPlainString();
     /*
     var module = TypeStore.type.interval;
@@ -800,7 +821,7 @@ TypeStore.type.time.prototype.partDefs=[
     {name:'seconds', optative:false, sufix:''  , twoDigits:true },
 ];
 // constructorFunction:new PostgresInterval().constructor,
-TypeStore.type.time.prototype.regExp=/^\s*(?:(\d+)\s*(?:h|:|hours?|horas?))?\s*(?:(\d+)\s*(?:m|:|'|min|minutes?|minutos?)?)?\s*(?:(\d+)\s*(?:s|"|sec|seg|seconds?|segundos?)?)?\s*?$/i;
+TypeStore.type.time.prototype.regExp=/^\s*(?:(\d+)(?!\d)\s*(?:h|:|hours?|horas?)\s*)?(?:(\d+)(?!\d)(?:\s*(?:m|:|'|min|minutes?|minutos?))?\s*)?(?:(\d+)(?!\d)(?:\s*(?:s|"|sec|seg|seconds?|segundos?))?\s*)?$/i;
 TypeStore.type.time.prototype.fromString=function fromString(stringWithTime){
     var value = this.toLocalString(stringWithTime);
     if (value.length <1 ) throw new TypeError("NOT time")
@@ -816,7 +837,7 @@ TypeStore.type.time.prototype.toLocalParts=function toLocalParts(typedValue,fPar
         rta.push(fPart(hour,"time-hour"));
         rta.push(fPart(':',"time-colon"));
         rta.push(fPart(minutes,"time-min"));
-        if (seconds != '00' && seconds != null) {
+        if (seconds !== '00' && seconds != null) {
             rta.push(fPart(':',"time-colon"));
             rta.push(fPart(seconds,"time-sec"));
         }
@@ -867,7 +888,7 @@ TypeStore.type.point.prototype.typeDbPg='point';
 TypeStore.type.point.prototype.pg_OID='600';
 TypeStore.type.point.prototype.fromString = function fromString(textValue){
     return textValue// .slice(1,-1);
-};;
+};
 TypeStore.type.point.prototype.pgSpecialParse=true;
 TypeStore.type.point.prototype.isValidTypedData=function isValidTypedData(typedData){
     return typedData === null || typeof typedData === 'string' && /^\(?-?\d+(\.\d*),-?\d+(\.\d*)\)?$/.test(typedData);

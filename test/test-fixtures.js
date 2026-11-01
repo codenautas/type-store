@@ -116,16 +116,16 @@ describe("fixtures", function(){
         var typer = TypeStore.typerFrom(typeDef.typeInfo||{typeName:typeDef.typeName});
         typeDef.fixtures.forEach(function(fixture){
           if(!fixture.skip){
-            it("accept \""+fixture.fromString+"\"", function(){
+            it("accept \""+fixture.fromString+"\"", function(){ // eslint-disable-line max-statements, complexity
+              var obtainedFromString
               if(fixture.fromStringError){
                 try{
-                  var obtainedFromString = typer.fromString(fixture.fromString);
+                  obtainedFromString = typer.fromString(fixture.fromString);
                 }catch(err){
                   var obtainedError = err;
                 }
                 discrepances.showAndThrow(obtainedError, fixture.fromStringError);
               }else{
-                var obtainedFromString;
                 var obtainedFromConstructor;
                 var obtained;
                 if('fromString' in fixture){
@@ -178,17 +178,18 @@ describe("fixtures", function(){
                     var obtainedHtml=typer.toHtmlText(obtained);
                     discrepances.showAndThrow(obtainedHtml, fixture.toHtmlText);
                 }
+                var localText
                 if('local' in fixture){
-                    var localText = fixture.local;
+                    localText = fixture.local;
                 }else if('toPlainString' in fixture){
-                    var localText = fixture.toPlainString;
+                    localText = fixture.toPlainString;
                 }else if('fromString' in fixture){
-                    var localText = fixture.fromString;
+                    localText = fixture.fromString;
                 }else if(obtainedOutput!==undefined){
-                    var localText = fixture.fromString;
+                    localText = fixture.fromString;
                 }else{
                     var skipFromLocal=true;
-                    var localText = '';
+                    localText = '';
                 }
                 if(obtained!==null){
                     var localObtained=typer.toLocalString(obtained);
@@ -198,11 +199,11 @@ describe("fixtures", function(){
                     discrepances.showAndThrow(localObtained, localText, {showContext:json4all.stringify(obtained)});
                     discrepances.showAndThrow(typer.isValidLocalString(localObtained),true,{showContext:'local:'+localObtained});
                     if(!skipFromLocal){
-                        var localObtained=typer.fromLocalString(localText);
+                        localObtained = typer.fromLocalString(localText);
                         discrepances.showAndThrow(localObtained, obtained);
                         if(fixture.fromLocal){
                             discrepances.showAndThrow(typer.isValidLocalString(fixture.fromLocal),true,{showContext:'local:'+fixture.fromLocal});
-                            var localObtained=typer.fromLocalString(fixture.fromLocal);
+                            localObtained = typer.fromLocalString(fixture.fromLocal);
                             discrepances.showAndThrow(localObtained, obtained);
                         }
                     }
