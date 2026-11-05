@@ -424,7 +424,7 @@ TypeStore.type.hugeint.prototype.maxBig= 1000000000000000;
 TypeStore.type.hugeint.prototype.minBig=-1000000000000000;
 TypeStore.type.hugeint.prototype.isInteger=true;
 TypeStore.type.hugeint.prototype.typeDbPg='numeric(1000)';
-TypeStore.type.hugeint.prototype.pgSpecialParse=true;
+TypeStore.type.hugeint.prototype.pgSpecialParse=false; // numeric(1000) arrives as OID 1700, parsed by decimal; hugeint has no OID of its own (it would inherit 701, double precision, from typeNumber)
 // TypeStore.type.hugeint.prototype.pg_OID:1700,
 TypeStore.type.hugeint.prototype.fromString=function fromString(textWithHugeInt){
     var self = this; // eslint-disable-line unicorn/no-this-assignment
@@ -475,6 +475,7 @@ TypeStore.type.bigint.prototype.maxValue= 9_223_372_036_854_775_807; // eslint-d
 TypeStore.type.bigint.prototype.minValue= -9_223_372_036_854_775_808;
 TypeStore.type.bigint.prototype.typeDbPg='bigint';
 TypeStore.type.bigint.prototype.pg_OID=20;
+TypeStore.type.bigint.prototype.pgSpecialParse=true; // int8 (OID 20) arrives as text
 
 TypeStore.type.decimal=function TypeDecimal(){ TypeStore.typeNumber.apply(this,arguments); };
 TypeStore.type.decimal.prototype=Object.create(TypeStore.typeNumber.prototype);
@@ -606,8 +607,8 @@ TypeStore.type.jsonb.prototype.toHtml=function toHtml(typedValue){
 
 TypeStore.type.jsona = function TypeArrayJsonA(){ TypeStore.type.jsonb.apply(this, arguments); };
 TypeStore.type.jsona.prototype = Object.create(TypeStore.type.jsonb.prototype);
-TypeStore.type.jsona.typeDbPg='json';
-TypeStore.type.jsona.pg_OID=114;
+TypeStore.type.jsona.prototype.typeDbPg='json';
+TypeStore.type.jsona.prototype.pg_OID=114;
 
 TypeStore.type.date = function TypeDate(){ TypeBase.apply(this, arguments); };
 TypeStore.type.date.prototype = Object.create(TypeBase.prototype);

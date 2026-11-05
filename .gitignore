@@ -36,3 +36,6 @@ node_modules
 # Local configs
 local-*
 *-local.*
+
+# Claude local working state
+.claude/

@@ -14,3 +14,4 @@ server4test:
       - test/test-bigint.js
       - test/test-fixtures.js
       - test/test-interval.js
+      - test/test-pg-oids.js
